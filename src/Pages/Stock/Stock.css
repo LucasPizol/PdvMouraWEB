@@ -1,0 +1,90 @@
+.stockContainer {
+  display: flex;
+  width: 100%;
+  font-family: var(--font);
+}
+
+.stockContent {
+  padding: 30px;
+  background-color: #eee;
+  width: 100%;
+  height: 100vh;
+  margin-left: 300px;
+}
+
+.stockPanel {
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0px 0px 35px 0px rgba(0, 0, 0, 0.162);
+}
+.stockPanelHeader {
+  width: 100%;
+  padding: 22px 22px;
+  background-color: var(--primary-color);
+  display: flex;
+  justify-content: space-between;
+  color: #fff;
+}
+.stockPanelHeader div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--secondary-color);
+  padding: 8px;
+  border-radius: 8px;
+  height: 100%;
+}
+.stockPanelHeader div input {
+  background-color: transparent;
+  border: none;
+  font-size: 16px;
+  color: white;
+  outline: none;
+  min-width: 350px;
+  &::placeholder {
+    color: #dedede;
+  }
+}
+
+.searchIcon {
+  width: 22px;
+  height: 22px;
+}
+
+.stockTable {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.stockTableContent {
+  overflow: auto;
+}
+
+.stockTableRow {
+  display: grid;
+  align-items: center;
+  justify-content: space-between;
+  grid-template-columns: 1fr 3fr 2fr 2fr 2fr 2fr;
+  padding: 20px;
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+}
+.stockTableRow input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.stockTableHeader {
+  width: 100%;
+  border-bottom: 1px solid #555;
+  font-weight: bold;
+}
+.stockTableRow p:nth-child(2) {
+  text-align: start;
+}

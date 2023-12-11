@@ -1,0 +1,7 @@
+@import url("https://fonts.googleapis.com/css2?family=Raleway&display=swap");
+
+:root {
+  --primary-color: #0033ab;
+  --secondary-color: #006ec7;
+  --font: "Raleway", sans-serif;
+}
