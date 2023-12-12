@@ -90,7 +90,6 @@ export const NewPedido = () => {
         .eq("id", fields.id_item);
 
       if (addToHistoric.error || updateStock.error) {
-        console.log(addToHistoric.error);
         Swal.fire({
           title: "Erro!",
           icon: "error",

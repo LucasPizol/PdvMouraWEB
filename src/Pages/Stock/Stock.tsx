@@ -12,6 +12,8 @@ import { useQuery } from "react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../../routes";
 import { useCheck } from "../../hooks/useCheck";
+import { IoTrashSharp } from "react-icons/io5";
+import Swal from "sweetalert2";
 
 interface Material {
   id: number;
@@ -61,6 +63,22 @@ export const Stock = () => {
     setMaterials(filtered);
   };
 
+  const handleRemoveItems = async () => {
+    const confirm = await Swal.fire({
+      title: "Atenção!",
+      icon: "warning",
+      text: `Deseja realmente exluir ${checked.length} item(ns)? Essa ação não poderá ser desfeita, e todo o histórico deste produto será excluido.`,
+      confirmButtonText: "Sim",
+      denyButtonText: "Não",
+      showDenyButton: true,
+    });
+
+    if (confirm.isConfirmed) {
+      await supabase.from("estoque").delete().in("id", checked);
+      window.location.reload();
+    }
+  };
+
   useEffect(() => {
     setMaterials(data?.data);
   }, [data]);
@@ -92,13 +110,23 @@ export const Stock = () => {
             onChange={checkAll}
             checked={checked.length === materials?.length}
           />
-          <p>Nome do produto</p>
-          <p>Categoria</p>
-          <p>Estoque mín.</p>
-          <p>Qtd disponível</p>
-          <p>Situação</p>
-          <p>Editar</p>
+          {checked.length === 0 ? (
+            <>
+              <p>Nome do produto</p>
+              <p>Categoria</p>
+              <p>Estoque mín.</p>
+              <p>Qtd disponível</p>
+              <p>Situação</p>
+              <p>Editar</p>
+            </>
+          ) : (
+            <p className={styles.remove} onClick={handleRemoveItems}>
+              <IoTrashSharp size={20} />
+              {`Remover ${checked.length} item(ns)`}
+            </p>
+          )}
         </div>
+
         <div className={styles.stockTableContent}>
           {materials?.map(
             ({ id, item, estoque_minimo, qtd_disponivel, categoria }) => (

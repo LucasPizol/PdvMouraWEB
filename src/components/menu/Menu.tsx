@@ -4,7 +4,7 @@ import styles from "./styles.module.scss";
 import { GiCardboardBoxClosed } from "react-icons/gi";
 import { supabase } from "../../supabase";
 import Swal from "sweetalert2";
-import { MdAccountCircle, MdStore } from "react-icons/md";
+import { MdAccountCircle, MdStore, MdPerson4, MdListAlt } from "react-icons/md";
 import { VscSignOut } from "react-icons/vsc";
 import { UserContext } from "../../routes";
 
@@ -71,7 +71,7 @@ export const Menu = () => {
           to="/historico"
           onClick={() => setActive(2)}
         >
-          <MdStore size={20} /> Histórico
+          <MdListAlt size={20} /> Histórico
         </Link>
         <div className={styles.navDivContent}>
           <span></span>
@@ -82,10 +82,19 @@ export const Menu = () => {
           style={
             active === 3 ? { backgroundColor: "#006ec7", color: "#fff" } : {}
           }
-          to="/pdvDeSucesso"
+          to="/customers"
           onClick={() => setActive(3)}
         >
-          <MdStore size={20} /> PDV de Sucesso
+          <MdPerson4 size={20} /> Clientes
+        </Link>
+        <Link
+          style={
+            active === 4 ? { backgroundColor: "#006ec7", color: "#fff" } : {}
+          }
+          to="/pdvDeSucesso"
+          onClick={() => setActive(4)}
+        >
+          <MdStore size={20} /> PDVs de Sucesso
         </Link>
       </nav>
       <button className={styles.signOut} onClick={signOut}>

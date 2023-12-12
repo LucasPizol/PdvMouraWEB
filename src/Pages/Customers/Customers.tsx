@@ -14,12 +14,7 @@ const getUsers = async (userData: UserType) => {
 
   const { data, error } = await supabase
     .from("users")
-    .select(
-      `
-      cod,
-      equipe: id_equipe(id_empresa)
-      `
-    )
+    .select("cod, equipe: id_equipe(id_empresa)")
     .eq("role", "salesperson")
     .eq("equipe.id_empresa", equipe.empresas)
     .order("cod");
@@ -27,15 +22,14 @@ const getUsers = async (userData: UserType) => {
   return { data, error };
 };
 
-export const PdvDeSucesso = () => {
+export const Customers = () => {
+  const [customers, setCustomers] = useState<any | null | undefined>();
+  const { checked, checkAll, checkFromId, isChecked } = useCheck(customers);
+
   const userData = useContext(UserContext);
   const navigate = useNavigate();
 
   const users = useQuery("getSellers", () => getUsers(userData));
-
-  const [customers, setCustomers] = useState<any | null | undefined>();
-
-  const { checked, checkAll, checkFromId, isChecked } = useCheck(customers);
 
   //   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
   //     const filtered = data?.data?.filter((historico: Historico) =>
@@ -50,28 +44,24 @@ export const PdvDeSucesso = () => {
 
   const handleSearchForItems = async (e: any) => {
     if (!userData) return;
-
     //@ts-ignore
     const equipe: { id: number; empresas: number } = userData[0].equipe;
     if (!users?.data?.data) return;
-
     const { data } =
       e.currentTarget.value === "Todos"
         ? await supabase
-            .from("pdvs")
-            .select(
-              "customers!inner (razao_social, cidade, cod, user_cod),img_url1,img_url2"
-            )
+            .from("customers")
+            .select("cod,razao_social,cidade,user_cod,pdvs (id)")
             .in(
-              "customers.user_cod",
-              users?.data?.data?.map((seller: { cod: number }) => seller.cod)
+              "user_cod",
+              users!.data!.data!.map((seller: { cod: number }) => seller.cod)
             )
         : await supabase
-            .from("pdvs")
-            .select(
-              "customers!inner (razao_social, cidade, cod, user_cod),img_url1,img_url2"
-            )
-            .eq("customers.user_cod", e.currentTarget.value);
+            .from("customers")
+            .select("cod,razao_social,cidade,user_cod,pdvs (id)")
+            .eq("user_cod", e.currentTarget.value)
+            .order("razao_social");
+
     setCustomers(data);
   };
 
@@ -80,14 +70,16 @@ export const PdvDeSucesso = () => {
     handleSearchForItems({ currentTarget: { value: "Todos" } });
   }, [userData, users]);
 
+  useEffect(() => {}, [users]);
+
   return (
     <div className={styles.stockPanel}>
       <header className={styles.stockPanelHeader}>
-        <h1>PDVs de Sucesso</h1>
+        <h1>Clientes</h1>
         <select
           style={{ cursor: "pointer" }}
           onChange={handleSearchForItems}
-          defaultValue="Todos"
+          defaultValue=""
         >
           <option value="Todos">Todos</option>
           {users?.data?.data?.map((seller: any) => (
@@ -122,35 +114,27 @@ export const PdvDeSucesso = () => {
           <p>Razão Social</p>
           <p>Cidade</p>
           <p>Vendedor</p>
-          <p>Imagem 1</p>
-          <p>Imagem 2</p>
+          <p>PDV de Sucesso</p>
         </div>
         <div className={styles.stockTableContent}>
-          {customers?.map(({ customers, img_url1, img_url2 }: any) => (
-            <div key={customers?.cod} className={styles.stockTableRow}>
-              <input
-                type="checkbox"
-                name=""
-                id=""
-                checked={isChecked(customers?.cod)}
-                onChange={() => checkFromId(customers?.cod)}
-              />
-              <p>{customers?.cod}</p>
-              <p>{customers?.razao_social}</p>
-              <p>{customers?.cidade}</p>
-              <p>{customers?.user_cod}</p>
-
-              <a href={img_url1} target="_blank">
-                Imagem 1
-              </a>
-
-              {img_url2 === "" ? null : (
-                <a href={img_url2} target="_blank">
-                  Imagem 2
-                </a>
-              )}
-            </div>
-          ))}
+          {customers?.map(
+            ({ cod, razao_social, cidade, user_cod, pdvs }: any) => (
+              <div key={cod} className={styles.stockTableRow}>
+                <input
+                  type="checkbox"
+                  name=""
+                  id=""
+                  checked={isChecked(cod)}
+                  onChange={() => checkFromId(cod)}
+                />
+                <p>{cod}</p>
+                <p>{razao_social}</p>
+                <p>{cidade}</p>
+                <p>{user_cod}</p>
+                <p>{pdvs.length === 0 ? "Não" : "Sim"}</p>
+              </div>
+            )
+          )}
         </div>
       </div>
     </div>

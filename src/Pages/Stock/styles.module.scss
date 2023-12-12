@@ -68,7 +68,7 @@
   align-items: center;
   justify-content: space-between;
   grid-template-columns: 1fr 3fr 2fr 2fr 2fr 2fr 1fr;
-  padding: 20px;
+  padding: 16px;
   text-align: center;
   border-bottom: 1px solid #ccc;
 
@@ -88,9 +88,16 @@
   border-bottom: 1px solid #555;
   font-weight: bold;
 }
+.remove {
+  color: red;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
 .footer {
   display: flex;
-  padding: 20px;
+  padding: 16px;
   background-color: $secondary-color;
   border-top-right-radius: 24px;
   border-top-left-radius: 24px;

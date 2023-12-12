@@ -9,6 +9,14 @@
   font-family: $font;
   display: flex;
   flex-direction: column;
+  overflow: auto;
+  &::-webkit-scrollbar {
+    width: 3px;
+  }
+  &::-webkit-scrollbar-thumb {
+    width: 3px;
+    background-color: $secondary-color;
+  }
 }
 .header {
   height: 150px;
@@ -32,7 +40,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-bottom: 10px;
+  margin: 10px 0;
 
   .navDiv {
     text-align: center;

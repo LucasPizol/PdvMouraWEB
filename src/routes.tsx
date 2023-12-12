@@ -11,6 +11,7 @@ import { NewFavorecido } from "./Pages/NewFavorecido/NewFavorecido";
 import { Historic } from "./Pages/Historic/Historic";
 import { NewPedido } from "./Pages/NewPedido/NewPedido";
 import { PdvDeSucesso } from "./Pages/PdvDeSucesso/PdvDeSucesso";
+import { Customers } from "./Pages/Customers/Customers";
 
 interface User {
   cod: string;
@@ -22,26 +23,32 @@ interface User {
 
 export type UserType = User[] | null | undefined;
 
-const getUser = async () => {
+const getAuth = async () => {
   const { data, error } = await supabase.auth.getUser();
   if (error) return { error };
-  console.log(data.user?.email);
+  return { data, error };
+};
+
+const getUser = async (email: string) => {
   const userData = await supabase
     .from("users")
     .select("cod,email,role,equipe:id_equipe (id, empresas: id_empresa)")
-    .eq("email", data.user?.email);
-  return { data, userData: userData.data };
+    .eq("email", email);
+
+  return { userData: userData.data };
 };
 
 export const UserContext = createContext<UserType>(null);
 
 export const RoutesApp = () => {
-  const { data } = useQuery("getUser", getUser);
+  const { data } = useQuery("getUser", getAuth);
   const [userData, setUserData] = useState<UserType>();
 
   useEffect(() => {
-    if (data?.data) {
-      setUserData(data?.userData);
+    if (data?.data?.user.email) {
+      getUser(data.data.user.email).then((user) => {
+        setUserData(user.userData);
+      });
     }
   }, [data]);
 
@@ -49,8 +56,8 @@ export const RoutesApp = () => {
     <UserContext.Provider value={userData}>
       <BrowserRouter>
         <Routes>
-          <Route path="/auth/login" element={<Login />} />
           <Route path="/" element={<DefaultPage Component={Stock} />} />
+          <Route path="/auth/login" element={<Login />} />
           <Route
             path="/novo/item"
             element={<DefaultPage Component={NewItem} />}
@@ -78,6 +85,10 @@ export const RoutesApp = () => {
           <Route
             path="/pdvDeSucesso"
             element={<DefaultPage Component={PdvDeSucesso} />}
+          />
+          <Route
+            path="/customers"
+            element={<DefaultPage Component={Customers} />}
           />
         </Routes>
       </BrowserRouter>
