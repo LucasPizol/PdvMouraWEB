@@ -1,0 +1,78 @@
+@import "../../styles/colors.module.scss";
+.menuContainer {
+  width: 100%;
+  max-width: 250px;
+  background-color: #fff;
+  position: fixed;
+  height: 100%;
+  box-shadow: 2px 0px 5px 0px rgba(0, 0, 0, 0.185);
+  font-family: $font;
+  display: flex;
+  flex-direction: column;
+}
+
+.menuContainer nav {
+  padding: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.navDivContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+
+  .navDiv {
+    text-align: center;
+    font-size: 14px;
+    color: #aaa;
+  }
+  span {
+    display: block;
+    height: 1px;
+    width: 100px;
+    background-color: #aaa;
+  }
+}
+
+.menuContainer nav a {
+  color: $secondary-color;
+  text-decoration: none;
+  font-family: var(--font);
+  padding: 16px 12px;
+  width: 100%;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  &:hover {
+    background-color: var(--secondary-color);
+  }
+}
+
+.signOut {
+  justify-self: flex-end;
+  padding: 12px;
+  color: red;
+  border: none;
+  background-color: transparent;
+  font-family: $font;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: 0.5s;
+  margin: 20px;
+  border-radius: 8px;
+  &:hover {
+    background-color: red;
+    color:white;
+    
+  }
+}

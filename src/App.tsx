@@ -1,5 +1,6 @@
-import "./App.css";
 import { RoutesApp } from "./routes";
+import "./styles/default.module.scss";
+import "./styles/styles.css";
 
 import { QueryClient, QueryClientProvider } from "react-query";
 

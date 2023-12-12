@@ -1,0 +1,53 @@
+@import "../../styles/colors.module.scss";
+
+.authContainer {
+  background: linear-gradient(to bottom right, #fff 0%, #fff 50%, $primary-color 50%, $secondary-color 120%);
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font;
+}
+
+.container {
+  max-width: 1250px;
+  width: 100%;
+  background-color: #fff;
+  height: 80%;
+  border-radius: 28px;
+  box-shadow: 0px 55px 105px 0px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  margin: 0 20px;
+  p {
+    color: #888;
+  }
+  .asideImage {
+    flex: 1;
+    max-width: 50%;
+    object-fit: cover;
+    height: 100%;
+  }
+}
+
+.formDiv {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  padding: 32px;
+  flex: 1;
+  gap: 50px;
+  .title {
+    width: 70%;
+    h2 {
+        margin-bottom: 10px;
+    }
+  }
+  img {
+    width: 50%;
+  }
+}

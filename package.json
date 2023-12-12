@@ -15,7 +15,8 @@
     "react-dom": "^18.2.0",
     "react-icons": "^4.12.0",
     "react-query": "^3.39.3",
-    "react-router-dom": "^6.20.1"
+    "react-router-dom": "^6.20.1",
+    "sweetalert2": "^11.10.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",
@@ -26,6 +27,7 @@
     "eslint": "^8.53.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
+    "sass": "^1.69.5",
     "typescript": "^5.2.2",
     "vite": "^5.0.0"
   }
