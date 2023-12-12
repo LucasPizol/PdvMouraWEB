@@ -1,5 +1,4 @@
 import { supabase } from "../../supabase";
-import { useQuery } from "react-query";
 import styles from "./styles.module.scss";
 import { useContext, useEffect } from "react";
 import { UserContext } from "../../routes";
@@ -9,37 +8,26 @@ import { useForm } from "../../hooks/useForm";
 import { MdArrowBack } from "react-icons/md";
 import Swal from "sweetalert2";
 
-const getCategories = async () => {
-  const { data, error } = await supabase.from("categoria").select();
-  return { data, error };
-};
-
 const initialFields = {
-  item: "",
-  estoque_minimo: 0,
-  id_categoria: 1,
+  favorecido: "",
 };
 
-export const NewItem = () => {
+export const NewFavorecido = () => {
   const user = useContext(UserContext);
   const navigate = useNavigate();
-  const { data } = useQuery("getCategories", getCategories);
+  const favorecidoData = useLocation();
 
-  const productData = useLocation();
-
-  const productDataFields = productData.state
+  const favorecidoDataFields = favorecidoData.state
     ? {
-        id_categoria: productData.state.id_categoria,
-        item: productData.state.item,
-        estoque_minimo: productData.state.estoque_minimo,
+        favorecido: favorecidoData.state.favorecido,
       }
     : null;
 
-  const [fields, changeField] = useForm(productDataFields || initialFields);
+  const [fields, changeField] = useForm(favorecidoDataFields || initialFields);
 
   useEffect(() => {
     //if (!user) navigate("/auth/login");
-  }, [user, productData]);
+  }, [user]);
 
   const handleRegister = async (e: any) => {
     e.preventDefault();
@@ -47,21 +35,20 @@ export const NewItem = () => {
     const swalAlert = await Swal.fire({
       title: "Atenção!",
       icon: "warning",
-      text: "Deseja realmente cadastrar/atualizar este produto?",
+      text: "Deseja realmente cadastrar este favorecido?",
       confirmButtonText: "Sim",
       showDenyButton: true,
       denyButtonText: "Não",
     });
 
     if (swalAlert) {
-      const { error } = productData.state
+      const { error } = favorecidoData.state
         ? await supabase
-            .from("estoque")
+            .from("favorecido")
             .update(fields)
-            .eq("id", productData.state.id)
-        : await supabase.from("estoque").insert({
+            .eq("id", favorecidoData.state.id)
+        : await supabase.from("favorecido").insert({
             ...fields,
-            qtd_disponivel: 0,
             //@ts-ignore
             id_empresa: user![0].equipe.empresas,
           });
@@ -71,7 +58,7 @@ export const NewItem = () => {
         Swal.fire({
           title: "Erro!",
           icon: "error",
-          text: "Ocorreu um erro ao cadastrar seu produto.",
+          text: "Ocorreu um erro ao cadastrar/atualizar seu produto.",
           confirmButtonText: "Ok",
         });
         return;
@@ -91,10 +78,10 @@ export const NewItem = () => {
 
       Toast.fire({
         icon: "success",
-        title: "Cadastrado com sucesso!",
+        title: "Cadastrado/atualizado com sucesso!",
       });
 
-      navigate("/");
+      navigate("/favorecidos");
     }
   };
 
@@ -106,47 +93,25 @@ export const NewItem = () => {
             className={styles.arrowBack}
             onClick={() => navigate("/")}
           />
-          {productData.state
-            ? "Atualizando um item"
-            : "Adicionando um novo item"}
+          {favorecidoData.state
+            ? "Atualizando favorecido"
+            : "Adicionando um novo favorecido"}
         </h1>
       </header>
       <div className={styles.content}>
         <form className={styles.form} onSubmit={handleRegister}>
           <div className={styles.inputGroup}>
-            <label htmlFor="item">Nome do item</label>
+            <label htmlFor="favorecido">Nome do favorecido</label>
             <input
               type="text"
-              name="item"
-              id="item"
+              name="favorecido"
+              id="favorecido"
               onChange={changeField}
-              value={fields.item}
-            />
-          </div>
-          <div className={styles.inputGroup}>
-            <label htmlFor="categoria">Categoria</label>
-            <select
-              name="id_categoria"
-              id="id_categoria"
-              onChange={changeField}
-            >
-              {data?.data?.map((item) => (
-                <option value={item.id}>{item.categoria}</option>
-              ))}
-            </select>
-          </div>
-          <div className={styles.inputGroup}>
-            <label htmlFor="estoque_minimo">Quantidade Mínima</label>
-            <input
-              type="text"
-              name="estoque_minimo"
-              id="estoque_minimo"
-              onChange={changeField}
-              value={fields.estoque_minimo}
+              value={fields.favorecido}
             />
           </div>
           <button type="submit" className={styles.button}>
-            {productData.state ? "Atualizar" : "Cadastrar"}
+            {favorecidoData.state ? "Atualizar" : "Cadastrar"}
           </button>
         </form>
         <img src={web_developer} alt="Imagem pessoa cadastrando" />

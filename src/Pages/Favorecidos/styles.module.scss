@@ -23,11 +23,11 @@
     background-color: #dedede;
     padding: 8px;
     border-radius: 8px;
-    height: 100%;
+
     input {
       background-color: transparent;
       border: none;
-      font-size: 16px;
+      font-size: 14px;
       color: black;
       outline: none;
       min-width: 350px;
@@ -42,7 +42,7 @@
     justify-content: center;
     gap: 16px;
     a {
-      color: $primary-color
+      color: $primary-color;
     }
   }
 }
@@ -68,7 +68,7 @@
   display: grid;
   align-items: center;
   justify-content: space-between;
-  grid-template-columns: 1fr 1fr 5fr;
+  grid-template-columns: 1fr 1fr 5fr 1fr;
   padding: 20px;
   text-align: start;
   border-bottom: 1px solid #ccc;
@@ -96,4 +96,11 @@
   border-top-right-radius: 24px;
   border-top-left-radius: 24px;
   flex: 2;
+}
+.button {
+  background-color: transparent;
+  align-self: flex-start;
+  width: 25px;
+  border: 0;
+  cursor: pointer;
 }

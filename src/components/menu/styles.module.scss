@@ -10,7 +10,15 @@
   display: flex;
   flex-direction: column;
 }
-
+.header {
+  height: 150px;
+  max-height: 150px;
+  background-color: $secondary-color;
+  color: white;
+  padding: 20px;
+  display: flex;
+  align-items: flex-end;
+}
 .menuContainer nav {
   padding: 20px;
   width: 100%;
@@ -72,7 +80,6 @@
   border-radius: 8px;
   &:hover {
     background-color: red;
-    color:white;
-    
+    color: white;
   }
 }
