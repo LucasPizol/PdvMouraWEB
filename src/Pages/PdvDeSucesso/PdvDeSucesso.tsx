@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import styles from "./styles.module.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { MdSearch, MdRemoveRedEye } from "react-icons/md";
@@ -38,59 +38,89 @@ const getUsers = async (userData: UserType) => {
   return { data, error };
 };
 
+const getCustomers = async (userData: UserType) => {
+  if (!userData) return;
+  const usersData = await getUsers(userData);
+
+  const { data } = await supabase
+    .from("pdvs")
+    .select(
+      "customers!inner (razao_social, cidade, cod, user_cod, logradouro),img_url1,img_url2,approved,id"
+    )
+    .in(
+      "customers.user_cod",
+      usersData!.data!.map((seller: { cod: number }) => seller.cod)
+    )
+    .order("razao_social", { referencedTable: "customers" });
+
+  return data;
+};
+
 export const PdvDeSucesso = () => {
   const userData = useContext(UserContext);
   const navigate = useNavigate();
+  const [fields, setFields] = useState({
+    cod: "",
+    razao_social: "",
+    cidade: "",
+    user_cod: "Todos",
+    situacao: "Todos",
+  });
 
   const users = useQuery("getSellers", () => getUsers(userData));
+  const customersData = useQuery("getCustomersDataPdv", () =>
+    getCustomers(userData)
+  );
   const [customers, setCustomers] = useState<any>();
 
-  const handleSearchForItems = async (e: any) => {
-    const value = e.currentTarget.value;
-    if (!userData) return;
-    const usersData = await getUsers(userData);
+  const handleSearch = (
+    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
+  ) => {
+    const field = { ...fields, [e.currentTarget.name]: e.currentTarget.value };
 
-    const { data } =
-      value === "Todos"
-        ? await supabase
-            .from("pdvs")
-            .select(
-              "customers!inner (razao_social, cidade, cod, user_cod, logradouro),img_url1,img_url2,approved,id"
-            )
-            .in(
-              "customers.user_cod",
-              usersData!.data!.map((seller: { cod: number }) => seller.cod)
-            )
-            .order("razao_social", { referencedTable: "customers" })
-        : await supabase
-            .from("pdvs")
-            .select(
-              "customers!inner (razao_social, cidade, cod, user_cod, logradouro),img_url1,img_url2,approved,id"
-            )
-            .eq("customers.user_cod", value)
-            .order("razao_social", { referencedTable: "customers" });
+    setFields(field);
 
-    setCustomers(data);
+    const filteredCustomers = customersData?.data?.filter(
+      (pdvDeSucesso: any) => {
+        const checkRazao = pdvDeSucesso.customers.razao_social
+          .toLowerCase()
+          .includes(field.razao_social.toLowerCase());
+        const checkCod = String(pdvDeSucesso.customers.cod).includes(field.cod);
+        const checkCity = pdvDeSucesso.customers.cidade
+          .toLowerCase()
+          .includes(field.cidade.toLowerCase());
+
+        const checkUserCod =
+          field.user_cod === "Todos"
+            ? true
+            : String(pdvDeSucesso.customers.user_cod).includes(field.user_cod);
+
+        const checkSituacao =
+          field.situacao === "Todos"
+            ? true
+            : pdvDeSucesso.approved === null
+            ? field.situacao === "Aguardando"
+            : pdvDeSucesso.approved
+            ? field.situacao === "APROVADO"
+            : field.situacao === "REPROVADO";
+
+        return (
+          checkRazao && checkCod && checkCity && checkUserCod && checkSituacao
+        );
+      }
+    );
+
+    setCustomers(filteredCustomers);
   };
 
   useEffect(() => {
-    handleSearchForItems({ currentTarget: { value: "Todos" } }).then(() => {});
-  }, [userData]);
+    setCustomers(customersData?.data);
+  }, [customersData.data]);
 
   return (
     <div className={styles.stockPanel}>
       <header className={styles.stockPanelHeader}>
         <h1>PDVs de Sucesso</h1>
-        <select
-          style={{ cursor: "pointer" }}
-          onChange={handleSearchForItems}
-          defaultValue="Todos"
-        >
-          <option value="Todos">Todos</option>
-          {users?.data?.data?.map((seller: any) => (
-            <option value={seller.cod}> {seller.cod}</option>
-          ))}
-        </select>
 
         <nav>
           <Link to="/novo/pedido">Novo pedido</Link>
@@ -114,6 +144,52 @@ export const PdvDeSucesso = () => {
           <p>Vendedor</p>
           <p>Situação</p>
           <p>Visualizar</p>
+        </div>
+        <div className={styles.stockTableHeaderFilter}>
+          <input
+            className={styles.filterHandler}
+            onChange={handleSearch}
+            type="search"
+            name="cod"
+            style={{ justifySelf: "start" }}
+          />
+          <input
+            className={styles.filterHandler}
+            onChange={handleSearch}
+            type="search"
+            name="razao_social"
+            style={{ justifySelf: "start" }}
+          />
+          <input
+            onChange={handleSearch}
+            type="search"
+            name="cidade"
+            className={styles.filterHandler}
+          />
+          <select
+            style={{ cursor: "pointer" }}
+            onChange={handleSearch}
+            defaultValue=""
+            className={styles.filterHandler}
+            name="user_cod"
+          >
+            <option value="Todos">Todos</option>
+            {users?.data?.data?.map((seller: any) => (
+              <option value={seller.cod}> {seller.cod}</option>
+            ))}
+          </select>
+          <select
+            style={{ cursor: "pointer" }}
+            onChange={handleSearch}
+            defaultValue=""
+            className={styles.filterHandler}
+            name="situacao"
+          >
+            <option value="Todos">Todos</option>
+            <option value="Aguardando">Aguardando</option>
+            <option value="APROVADO">APROVADO</option>
+            <option value="REPROVADO">REPROVADO</option>
+          </select>
         </div>
         <div className={styles.stockTableContent}>
           {customers?.map(
