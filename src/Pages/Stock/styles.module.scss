@@ -15,7 +15,9 @@
   width: 100%;
   padding: 22px 22px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 45px;
+  align-items: center;
   div {
     display: flex;
     align-items: center;
@@ -73,6 +75,8 @@
   border-bottom: 1px solid #ccc;
 
   p:nth-child(2) {
+    justify-content: flex-start;
+    align-items: flex-start;
     text-align: start;
   }
   input[type="checkbox"] {
@@ -84,9 +88,19 @@
 
 .stockTableHeader {
   @extend .stockTableRow;
+
   width: 100%;
   border-bottom: 1px solid #555;
   font-weight: bold;
+}
+.filterHandler {
+  font-family: $font;
+  padding: 4px;
+  border-radius: 4px;
+  outline: none;
+  border: 1px solid #555;
+  width: 80%;
+  justify-self: center;
 }
 .remove {
   color: red;

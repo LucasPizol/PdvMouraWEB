@@ -67,12 +67,13 @@
   display: grid;
   align-items: center;
   justify-content: space-between;
-  grid-template-columns: 0.7fr 2fr 3fr 2fr 2fr 2fr 2fr;
+  grid-template-columns: 0.6fr 1.5fr 1fr 0.6fr 0.6fr 0.6fr 0.6fr;
   padding: 16px;
   text-align: center;
   border-bottom: 1px solid #ccc;
 
-  p:nth-child(3) {
+  p:nth-child(2),
+  p:nth-child(1) {
     text-align: start;
   }
   input[type="checkbox"] {
@@ -100,4 +101,16 @@
   background-color: transparent;
   border: 0;
   cursor: pointer;
+  width: 25px;
+  height: 25px;
+  align-self: center;
+  justify-self: center;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+  &:hover {
+    background-color: #dedede;
+  }
 }

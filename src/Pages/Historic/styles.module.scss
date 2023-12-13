@@ -16,25 +16,10 @@
   padding: 22px 22px;
   display: flex;
   justify-content: space-between;
-  div {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #dedede;
-    padding: 8px;
-    border-radius: 8px;
-    input {
-      background-color: transparent;
-      border: none;
-      font-size: 14px;
-      color: black;
-      outline: none;
-      min-width: 350px;
-      &::placeholder {
-        color: #888;
-      }
-    }
-  }
+  gap: 45px;
+  align-items: center;
+
+
   nav {
     display: flex;
     align-items: center;
@@ -43,6 +28,22 @@
     a {
       color: $primary-color;
     }
+  }
+}
+.titleDiv {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 45px;
+
+}
+.periodo {
+  margin-left: 150px;
+  display: flex;
+  gap: 30px;
+  div {
+    display: flex;
+    gap: 10px;
   }
 }
 
@@ -81,7 +82,15 @@
     cursor: pointer;
   }
 }
-
+.filterHandler {
+  font-family: $font;
+  padding: 4px;
+  border-radius: 4px;
+  outline: none;
+  border: 1px solid #555;
+  width: 80%;
+  justify-self: center;
+}
 .stockTableHeader {
   @extend .stockTableRow;
   width: 100%;

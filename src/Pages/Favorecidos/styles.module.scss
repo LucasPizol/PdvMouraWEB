@@ -82,7 +82,15 @@
     cursor: pointer;
   }
 }
-
+.filterHandler {
+  font-family: $font;
+  padding: 4px;
+  border-radius: 4px;
+  outline: none;
+  border: 1px solid #555;
+  width: 80%;
+  justify-self: center;
+}
 .stockTableHeader {
   @extend .stockTableRow;
   width: 100%;

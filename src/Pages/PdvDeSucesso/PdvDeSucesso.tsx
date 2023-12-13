@@ -1,11 +1,22 @@
 import { useContext, useEffect, useState } from "react";
 import styles from "./styles.module.scss";
 import { Link, useNavigate } from "react-router-dom";
-import { MdSearch } from "react-icons/md";
-import { useQuery } from "react-query";
+import { MdMoreVert, MdSearch, MdRemoveRedEye } from "react-icons/md";
 import { UserContext, UserType } from "../../routes";
 import { supabase } from "../../supabase";
-import { useCheck } from "../../hooks/useCheck";
+import { useQuery } from "react-query";
+
+export interface PDVdeSucesso {
+  customers: { razao_social: string; cod: number; cidade: string; user_cod: string; logradouro: string };
+  img_url1: string;
+  img_url2: string;
+  approved: boolean | null;
+  id: number;
+}
+
+const getDescription = (situation: boolean) => {
+  return situation ? "APROVADO" : "REPROVADO";
+};
 
 const getUsers = async (userData: UserType) => {
   if (!userData) return;
@@ -14,16 +25,10 @@ const getUsers = async (userData: UserType) => {
 
   const { data, error } = await supabase
     .from("users")
-    .select(
-      `
-      cod,
-      equipe: id_equipe(id_empresa)
-      `
-    )
+    .select("cod,equipe: id_equipe(id_empresa)")
     .eq("role", "salesperson")
     .eq("equipe.id_empresa", equipe.empresas)
     .order("cod");
-
   return { data, error };
 };
 
@@ -32,63 +37,41 @@ export const PdvDeSucesso = () => {
   const navigate = useNavigate();
 
   const users = useQuery("getSellers", () => getUsers(userData));
-
-  const [customers, setCustomers] = useState<any | null | undefined>();
-
-  const { checked, checkAll, checkFromId, isChecked } = useCheck(customers);
-
-  //   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
-  //     const filtered = data?.data?.filter((historico: Historico) =>
-  //       //@ts-ignore
-  //       historico.favorecido
-  //         .toLowerCase()
-  //         .includes(e.currentTarget.value.toLowerCase())
-  //     );
-
-  //     setFavorecidos(filtered);
-  //   };
+  const [customers, setCustomers] = useState<any>();
 
   const handleSearchForItems = async (e: any) => {
+    const value = e.currentTarget.value;
     if (!userData) return;
-
-    //@ts-ignore
-    const equipe: { id: number; empresas: number } = userData[0].equipe;
-    if (!users?.data?.data) return;
+    const usersData = await getUsers(userData);
 
     const { data } =
-      e.currentTarget.value === "Todos"
+      value === "Todos"
         ? await supabase
             .from("pdvs")
-            .select(
-              "customers!inner (razao_social, cidade, cod, user_cod),img_url1,img_url2"
-            )
+            .select("customers!inner (razao_social, cidade, cod, user_cod, logradouro),img_url1,img_url2,approved,id")
             .in(
               "customers.user_cod",
-              users?.data?.data?.map((seller: { cod: number }) => seller.cod)
+              usersData!.data!.map((seller: { cod: number }) => seller.cod)
             )
+            .order("razao_social", { referencedTable: "customers" })
         : await supabase
             .from("pdvs")
-            .select(
-              "customers!inner (razao_social, cidade, cod, user_cod),img_url1,img_url2"
-            )
-            .eq("customers.user_cod", e.currentTarget.value);
+            .select("customers!inner (razao_social, cidade, cod, user_cod, logradouro),img_url1,img_url2,approved,id")
+            .eq("customers.user_cod", value)
+            .order("razao_social", { referencedTable: "customers" });
+
     setCustomers(data);
   };
 
   useEffect(() => {
-    if (!userData) navigate("/auth/login");
-    handleSearchForItems({ currentTarget: { value: "Todos" } });
-  }, [userData, users]);
+    handleSearchForItems({ currentTarget: { value: "Todos" } }).then(() => {});
+  }, [userData]);
 
   return (
     <div className={styles.stockPanel}>
       <header className={styles.stockPanelHeader}>
         <h1>PDVs de Sucesso</h1>
-        <select
-          style={{ cursor: "pointer" }}
-          onChange={handleSearchForItems}
-          defaultValue="Todos"
-        >
+        <select style={{ cursor: "pointer" }} onChange={handleSearchForItems} defaultValue="Todos">
           <option value="Todos">Todos</option>
           {users?.data?.data?.map((seller: any) => (
             <option value={seller.cod}> {seller.cod}</option>
@@ -111,44 +94,23 @@ export const PdvDeSucesso = () => {
       </header>
       <div className={styles.stockTable}>
         <div className={styles.stockTableHeader}>
-          <input
-            type="checkbox"
-            name=""
-            id=""
-            onChange={checkAll}
-            checked={checked.length === customers?.length}
-          />
           <p>Codigo</p>
           <p>Razão Social</p>
           <p>Cidade</p>
           <p>Vendedor</p>
-          <p>Imagem 1</p>
-          <p>Imagem 2</p>
+          <p>Ações</p>
         </div>
         <div className={styles.stockTableContent}>
-          {customers?.map(({ customers, img_url1, img_url2 }: any) => (
+          {customers?.map(({ id, customers, img_url1, img_url2, approved }: PDVdeSucesso) => (
             <div key={customers?.cod} className={styles.stockTableRow}>
-              <input
-                type="checkbox"
-                name=""
-                id=""
-                checked={isChecked(customers?.cod)}
-                onChange={() => checkFromId(customers?.cod)}
-              />
               <p>{customers?.cod}</p>
               <p>{customers?.razao_social}</p>
               <p>{customers?.cidade}</p>
               <p>{customers?.user_cod}</p>
-
-              <a href={img_url1} target="_blank">
-                Imagem 1
-              </a>
-
-              {img_url2 === "" ? null : (
-                <a href={img_url2} target="_blank">
-                  Imagem 2
-                </a>
-              )}
+              <p>{approved === null ? "Aguardando" : getDescription(approved)}</p>
+              <button onClick={() => navigate("/pdvPage", { state: { id, customers, img_url1, img_url2, approved } })} className={styles.button}>
+                <MdRemoveRedEye size={25} />
+              </button>
             </div>
           ))}
         </div>

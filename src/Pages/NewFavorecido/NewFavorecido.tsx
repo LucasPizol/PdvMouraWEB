@@ -91,7 +91,7 @@ export const NewFavorecido = () => {
         <h1>
           <MdArrowBack
             className={styles.arrowBack}
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/favorecidos")}
           />
           {favorecidoData.state
             ? "Atualizando favorecido"

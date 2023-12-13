@@ -1,0 +1,67 @@
+@import "../../styles/colors.module.scss";
+
+.stockPanel {
+  width: 100%;
+  background-color: #fff;
+  overflow: hidden;
+  box-shadow: 0px 0px 35px 0px rgba(0, 0, 0, 0.162);
+  flex: 1;
+  padding: 0px 20px;
+  font-family: $font;
+  display: flex;
+  padding: 50px;
+  gap: 30px;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 10px;
+}
+
+.images {
+  display: flex;
+  gap: 20px;
+  flex: 3;
+}
+
+.image {
+  max-height: 500px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.aprovar {
+  margin-top: 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.return {
+  border-radius: 8px;
+  padding: 8px;
+  border: 1px solid #aaa;
+  outline: 0;
+  font-family: $font;
+  font-size: 14px;
+  &:focus {
+    box-shadow: 0px 0px 3px #00000049;
+  }
+}
+
+.button {
+  padding: 8px;
+  margin-top: 40px;
+  border-radius: 4px;
+  outline: 0;
+  background-color: $primary-color;
+  color: white;
+  border: none;
+  font-family: $font;
+  font-size: 14px;
+  &:not(:disabled) {
+    cursor: pointer;
+  }
+}

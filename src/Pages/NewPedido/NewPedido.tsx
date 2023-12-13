@@ -126,7 +126,7 @@ export const NewPedido = () => {
         <h1>
           <MdArrowBack
             className={styles.arrowBack}
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/historico")}
           />
           Adicionando um novo item
         </h1>

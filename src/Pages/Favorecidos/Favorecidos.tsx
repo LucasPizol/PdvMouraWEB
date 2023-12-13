@@ -3,7 +3,7 @@ import styles from "./styles.module.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { MdEditSquare, MdSearch } from "react-icons/md";
 import { useQuery } from "react-query";
-import { UserContext } from "../../routes";
+import { UserContext, UserType } from "../../routes";
 import { supabase } from "../../supabase";
 import { useCheck } from "../../hooks/useCheck";
 
@@ -12,47 +12,38 @@ interface Favorecido {
   favorecido: string;
 }
 
+const getFavorecidos = async (userData: UserType) => {
+  if (!userData) return;
+  //@ts-ignore
+  const equipe: { id: number; empresas: number } = userData[0].equipe;
+
+  const { data, error } = await supabase
+    .from("favorecido")
+    .select(
+      `id,
+      favorecido
+      `
+    )
+    .eq("id_empresa", equipe.empresas);
+  return { data, error };
+};
+
 export const Favorecidos = () => {
+  const { data } = useQuery("getFavorecidos", () => getFavorecidos(userData));
+  const [favorecidos, setFavorecidos] = useState<Favorecido[] | null | undefined>();
+  const { checked, checkAll, checkFromId, isChecked } = useCheck(favorecidos);
   const userData = useContext(UserContext);
   const navigate = useNavigate();
 
-  const getFavorecidos = async () => {
-    if (!userData) return;
-    //@ts-ignore
-    const equipe: { id: number; empresas: number } = userData[0].equipe;
-
-    const { data, error } = await supabase
-      .from("favorecido")
-      .select(
-        `id,
-        favorecido
-        `
-      )
-      .eq("id_empresa", equipe.empresas);
-    return { data, error };
-  };
-
-  useEffect(() => {
-    if (!userData) navigate("/auth/login");
-  }, [userData]);
-
-  const { data } = useQuery("getFavorecidos", getFavorecidos);
-  const [favorecidos, setFavorecidos] = useState<
-    Favorecido[] | null | undefined
-  >();
-
-  const { checked, checkAll, checkFromId, isChecked } = useCheck(favorecidos);
-
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     const filtered = data?.data?.filter((favorecido: Favorecido) =>
-      favorecido.favorecido
-        .toLowerCase()
-        .includes(e.currentTarget.value.toLowerCase())
+      favorecido.favorecido.toLowerCase().includes(e.currentTarget.value.toLowerCase())
     );
     setFavorecidos(filtered);
   };
 
   useEffect(() => {
+    if (!userData) navigate("/auth/login");
     setFavorecidos(data?.data);
   }, [data]);
 
@@ -63,26 +54,14 @@ export const Favorecidos = () => {
         <nav>
           <Link to="/novo/favorecido">Novo favorecido</Link>
           <div>
-            <input
-              placeholder="Procure um item"
-              type="search"
-              onChange={handleSearch}
-              name=""
-              id=""
-            />
+            <input placeholder="Procure um item" type="search" onChange={handleSearch} name="" id="" />
             <MdSearch className={styles.searchIcon} />
           </div>
         </nav>
       </header>
       <div className={styles.stockTable}>
         <div className={styles.stockTableHeader}>
-          <input
-            type="checkbox"
-            name=""
-            id=""
-            onChange={checkAll}
-            checked={checked.length === favorecidos?.length}
-          />
+          <input type="checkbox" name="" id="" onChange={checkAll} checked={checked.length === favorecidos?.length} />
           <p>#</p>
           <p>Favorecido</p>
           <p>Editar</p>
@@ -90,13 +69,7 @@ export const Favorecidos = () => {
         <div className={styles.stockTableContent}>
           {favorecidos?.map(({ id, favorecido }) => (
             <div key={id} className={styles.stockTableRow}>
-              <input
-                type="checkbox"
-                name=""
-                id=""
-                checked={isChecked(id)}
-                onChange={() => checkFromId(id)}
-              />
+              <input type="checkbox" name="" id="" checked={isChecked(id)} onChange={() => checkFromId(id)} />
               <p>{id}</p>
               <p>{favorecido}</p>
               <button

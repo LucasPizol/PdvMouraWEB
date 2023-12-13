@@ -1,11 +1,6 @@
 import { useState, ChangeEvent, useEffect, useContext } from "react";
 import styles from "./styles.module.scss";
-import {
-  MdSearch,
-  MdCheckCircleOutline,
-  MdBlock,
-  MdEditSquare,
-} from "react-icons/md";
+import { MdSearch, MdCheckCircleOutline, MdBlock, MdEditSquare } from "react-icons/md";
 import { IoAlertCircleOutline } from "react-icons/io5";
 import { supabase } from "../../supabase";
 import { useQuery } from "react-query";
@@ -14,14 +9,25 @@ import { UserContext } from "../../routes";
 import { useCheck } from "../../hooks/useCheck";
 import { IoTrashSharp } from "react-icons/io5";
 import Swal from "sweetalert2";
+import { useForm } from "../../hooks/useForm";
 
 interface Material {
   id: number;
   item: string;
   estoque_minimo: number;
   qtd_disponivel: number;
-  categoria: { categoria: string }[];
+  categoria: { id: number; categoria: string }[];
 }
+
+interface Category {
+  id: number;
+  categoria: string;
+}
+
+const getCategories = async () => {
+  const { data, error } = await supabase.from("categoria").select();
+  return { data, error };
+};
 
 export const Stock = () => {
   const userData = useContext(UserContext);
@@ -47,6 +53,11 @@ export const Stock = () => {
   };
 
   const { data } = useQuery("getMaterials", getItemsFromStock);
+  const categories = useQuery("getStockCategoies", getCategories);
+  const [fields, setFields] = useState({
+    item: "",
+    categoria: 0,
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -56,11 +67,21 @@ export const Stock = () => {
   const [materials, setMaterials] = useState<Material[] | null | undefined>();
   const { checked, checkAll, checkFromId, isChecked } = useCheck(materials);
 
-  const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
-    const filtered = data?.data?.filter((material: Material) =>
-      material.item.toLowerCase().includes(e.currentTarget.value.toLowerCase())
-    );
-    setMaterials(filtered);
+  const handleSearch = (e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => {
+    const field = { ...fields, [e.currentTarget.name]: e.currentTarget.value };
+
+    setFields(field);
+
+    const filteredMaterials = data?.data?.filter((material: Material) => {
+      //@ts-ignore
+      const checkCategoria = Number(field.categoria) === 0 ? true : Number(field.categoria) === material.categoria.id;
+
+      const checkItem = material.item.toLowerCase().includes(field.item.toLowerCase());
+
+      return checkItem && checkCategoria;
+    });
+
+    setMaterials(filteredMaterials);
   };
 
   const handleRemoveItems = async () => {
@@ -89,27 +110,11 @@ export const Stock = () => {
         <h1>Estoque</h1>
         <nav>
           <Link to="/novo/item">Novo item</Link>
-          <div>
-            <input
-              placeholder="Procure um item"
-              type="search"
-              onChange={handleSearch}
-              name=""
-              id=""
-            />
-            <MdSearch className={styles.searchIcon} />
-          </div>
         </nav>
       </header>
       <div className={styles.stockTable}>
         <div className={styles.stockTableHeader}>
-          <input
-            type="checkbox"
-            name=""
-            id=""
-            onChange={checkAll}
-            checked={checked.length === materials?.length}
-          />
+          <input type="checkbox" name="" id="" onChange={checkAll} checked={checked.length === materials?.length} />
           {checked.length === 0 ? (
             <>
               <p>Nome do produto</p>
@@ -118,6 +123,16 @@ export const Stock = () => {
               <p>Qtd disponível</p>
               <p>Situação</p>
               <p>Editar</p>
+              <>
+                <p></p>
+                <input className={styles.filterHandler} style={{ justifySelf: "start" }} type="text" name="item" onChange={handleSearch} />
+                <select className={styles.filterHandler} defaultValue={0} name="categoria" onChange={handleSearch}>
+                  <option value={0}>Todos</option>
+                  {categories.data?.data?.map((category: Category) => (
+                    <option value={category.id}>{category.categoria}</option>
+                  ))}
+                </select>
+              </>
             </>
           ) : (
             <p className={styles.remove} onClick={handleRemoveItems}>
@@ -128,54 +143,46 @@ export const Stock = () => {
         </div>
 
         <div className={styles.stockTableContent}>
-          {materials?.map(
-            ({ id, item, estoque_minimo, qtd_disponivel, categoria }) => (
-              <div key={id} className={styles.stockTableRow}>
-                <input
-                  type="checkbox"
-                  name=""
-                  id=""
-                  checked={isChecked(id)}
-                  onChange={() => checkFromId(id)}
-                />
-                <p>{item}</p>
-                <p>
-                  {
-                    //@ts-ignore
-                    categoria.categoria
-                  }
-                </p>
-                <p>{estoque_minimo}</p>
-                <p>{qtd_disponivel}</p>
-                <p>
-                  {qtd_disponivel >= estoque_minimo ? (
-                    <MdCheckCircleOutline size={25} color="#1646E6" />
-                  ) : qtd_disponivel !== 0 ? (
-                    <IoAlertCircleOutline size={25} color="#FF9900" />
-                  ) : (
-                    <MdBlock size={25} color="#f00" />
-                  )}
-                </p>
-                <button
-                  className={styles.button}
-                  onClick={() =>
-                    navigate(`/novo/item`, {
-                      state: {
-                        id,
-                        item,
-                        estoque_minimo,
-                        qtd_disponivel,
-                        //@ts-ignore
-                        id_categoria: categoria.id,
-                      },
-                    })
-                  }
-                >
-                  <MdEditSquare size={25} color="#1646E6" />
-                </button>
-              </div>
-            )
-          )}
+          {materials?.map(({ id, item, estoque_minimo, qtd_disponivel, categoria }) => (
+            <div key={id} className={styles.stockTableRow}>
+              <input type="checkbox" name="" id="" checked={isChecked(id)} onChange={() => checkFromId(id)} />
+              <p>{item}</p>
+              <p>
+                {
+                  //@ts-ignore
+                  categoria.categoria
+                }
+              </p>
+              <p>{estoque_minimo}</p>
+              <p>{qtd_disponivel}</p>
+              <p>
+                {qtd_disponivel >= estoque_minimo ? (
+                  <MdCheckCircleOutline size={25} color="#1646E6" />
+                ) : qtd_disponivel !== 0 ? (
+                  <IoAlertCircleOutline size={25} color="#FF9900" />
+                ) : (
+                  <MdBlock size={25} color="#f00" />
+                )}
+              </p>
+              <button
+                className={styles.button}
+                onClick={() =>
+                  navigate(`/novo/item`, {
+                    state: {
+                      id,
+                      item,
+                      estoque_minimo,
+                      qtd_disponivel,
+                      //@ts-ignore
+                      id_categoria: categoria.id,
+                    },
+                  })
+                }
+              >
+                <MdEditSquare size={25} color="#1646E6" />
+              </button>
+            </div>
+          ))}
         </div>
       </div>
     </div>

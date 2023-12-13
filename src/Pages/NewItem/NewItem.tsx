@@ -67,7 +67,6 @@ export const NewItem = () => {
           });
 
       if (error) {
-        console.log(error.message);
         Swal.fire({
           title: "Erro!",
           icon: "error",
@@ -92,6 +91,7 @@ export const NewItem = () => {
       Toast.fire({
         icon: "success",
         title: "Cadastrado com sucesso!",
+        
       });
 
       navigate("/");
