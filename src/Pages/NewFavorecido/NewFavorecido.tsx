@@ -41,7 +41,7 @@ export const NewFavorecido = () => {
       denyButtonText: "Não",
     });
 
-    if (swalAlert) {
+    if (swalAlert.isConfirmed) {
       const { error } = favorecidoData.state
         ? await supabase
             .from("favorecido")
@@ -54,7 +54,6 @@ export const NewFavorecido = () => {
           });
 
       if (error) {
-        console.log(error.message);
         Swal.fire({
           title: "Erro!",
           icon: "error",

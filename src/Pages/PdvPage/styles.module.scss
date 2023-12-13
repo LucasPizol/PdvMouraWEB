@@ -1,10 +1,10 @@
 @import "../../styles/colors.module.scss";
 
 .stockPanel {
+  height: 100%;
   width: 100%;
   background-color: #fff;
   overflow: hidden;
-  box-shadow: 0px 0px 35px 0px rgba(0, 0, 0, 0.162);
   flex: 1;
   padding: 0px 20px;
   font-family: $font;
@@ -12,28 +12,35 @@
   padding: 50px;
   gap: 30px;
 }
-
+.title {
+  font-size: 26px;
+}
 .info {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   flex: 1;
   gap: 10px;
 }
-
 .images {
   display: flex;
   gap: 20px;
   flex: 3;
+  max-height: 100%;
 }
 
 .image {
-  max-height: 500px;
-  object-fit: contain;
+  height: 100%;
   border-radius: 10px;
+  flex: 1;
+}
+.formApprove {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .aprovar {
-  margin-top: 30px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -53,7 +60,6 @@
 
 .button {
   padding: 8px;
-  margin-top: 40px;
   border-radius: 4px;
   outline: 0;
   background-color: $primary-color;
@@ -64,4 +70,5 @@
   &:not(:disabled) {
     cursor: pointer;
   }
+  margin-top: 10px;
 }

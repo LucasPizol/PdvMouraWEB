@@ -1,13 +1,19 @@
 import { useContext, useEffect, useState } from "react";
 import styles from "./styles.module.scss";
 import { Link, useNavigate } from "react-router-dom";
-import { MdMoreVert, MdSearch, MdRemoveRedEye } from "react-icons/md";
+import { MdSearch, MdRemoveRedEye } from "react-icons/md";
 import { UserContext, UserType } from "../../routes";
 import { supabase } from "../../supabase";
 import { useQuery } from "react-query";
 
 export interface PDVdeSucesso {
-  customers: { razao_social: string; cod: number; cidade: string; user_cod: string; logradouro: string };
+  customers: {
+    razao_social: string;
+    cod: number;
+    cidade: string;
+    user_cod: string;
+    logradouro: string;
+  };
   img_url1: string;
   img_url2: string;
   approved: boolean | null;
@@ -48,7 +54,9 @@ export const PdvDeSucesso = () => {
       value === "Todos"
         ? await supabase
             .from("pdvs")
-            .select("customers!inner (razao_social, cidade, cod, user_cod, logradouro),img_url1,img_url2,approved,id")
+            .select(
+              "customers!inner (razao_social, cidade, cod, user_cod, logradouro),img_url1,img_url2,approved,id"
+            )
             .in(
               "customers.user_cod",
               usersData!.data!.map((seller: { cod: number }) => seller.cod)
@@ -56,7 +64,9 @@ export const PdvDeSucesso = () => {
             .order("razao_social", { referencedTable: "customers" })
         : await supabase
             .from("pdvs")
-            .select("customers!inner (razao_social, cidade, cod, user_cod, logradouro),img_url1,img_url2,approved,id")
+            .select(
+              "customers!inner (razao_social, cidade, cod, user_cod, logradouro),img_url1,img_url2,approved,id"
+            )
             .eq("customers.user_cod", value)
             .order("razao_social", { referencedTable: "customers" });
 
@@ -71,7 +81,11 @@ export const PdvDeSucesso = () => {
     <div className={styles.stockPanel}>
       <header className={styles.stockPanelHeader}>
         <h1>PDVs de Sucesso</h1>
-        <select style={{ cursor: "pointer" }} onChange={handleSearchForItems} defaultValue="Todos">
+        <select
+          style={{ cursor: "pointer" }}
+          onChange={handleSearchForItems}
+          defaultValue="Todos"
+        >
           <option value="Todos">Todos</option>
           {users?.data?.data?.map((seller: any) => (
             <option value={seller.cod}> {seller.cod}</option>
@@ -98,21 +112,33 @@ export const PdvDeSucesso = () => {
           <p>Razão Social</p>
           <p>Cidade</p>
           <p>Vendedor</p>
-          <p>Ações</p>
+          <p>Situação</p>
+          <p>Visualizar</p>
         </div>
         <div className={styles.stockTableContent}>
-          {customers?.map(({ id, customers, img_url1, img_url2, approved }: PDVdeSucesso) => (
-            <div key={customers?.cod} className={styles.stockTableRow}>
-              <p>{customers?.cod}</p>
-              <p>{customers?.razao_social}</p>
-              <p>{customers?.cidade}</p>
-              <p>{customers?.user_cod}</p>
-              <p>{approved === null ? "Aguardando" : getDescription(approved)}</p>
-              <button onClick={() => navigate("/pdvPage", { state: { id, customers, img_url1, img_url2, approved } })} className={styles.button}>
-                <MdRemoveRedEye size={25} />
-              </button>
-            </div>
-          ))}
+          {customers?.map(
+            ({ id, customers, img_url1, img_url2, approved }: PDVdeSucesso) => (
+              <div key={customers?.cod} className={styles.stockTableRow}>
+                <p>{customers?.cod}</p>
+                <p>{customers?.razao_social}</p>
+                <p>{customers?.cidade}</p>
+                <p>{customers?.user_cod}</p>
+                <p>
+                  {approved === null ? "Aguardando" : getDescription(approved)}
+                </p>
+                <button
+                  onClick={() =>
+                    navigate("/pdvPage", {
+                      state: { id, customers, img_url1, img_url2, approved },
+                    })
+                  }
+                  className={styles.button}
+                >
+                  <MdRemoveRedEye size={25} />
+                </button>
+              </div>
+            )
+          )}
         </div>
       </div>
     </div>

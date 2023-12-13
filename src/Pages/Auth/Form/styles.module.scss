@@ -6,6 +6,7 @@
   justify-content: center;
   flex-direction: column;
   gap: 15px;
+
   button {
     padding: 8px 4px;
     width: 50%;
@@ -18,7 +19,7 @@
     transition: 0.5s;
     cursor: pointer;
     &:hover {
-        background-color: $secondary-color;
+      background-color: $secondary-color;
     }
   }
 }
@@ -42,14 +43,14 @@
     background-color: #e6e6e6;
     border: none;
     input {
-        padding: 6px 4px;
-        background-color: transparent;
-        outline: 0;
-        border: none;
-        width: 100%;
-        color: #555;
-        font-family: $font;
-        font-size: 15px;
+      padding: 6px 4px;
+      background-color: transparent;
+      outline: 0;
+      border: none;
+      width: 100%;
+      color: #555;
+      font-family: $font;
+      font-size: 15px;
     }
   }
   label {

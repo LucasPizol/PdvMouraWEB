@@ -29,5 +29,9 @@ export const useCheck = (array: any | null | undefined) => {
     return checked.findIndex((number: number) => number === id) !== -1;
   };
 
-  return { checked, checkAll, checkFromId, isChecked };
+  const uncheckAll = () => {
+    setChecked([]);
+  };
+
+  return { checked, checkAll, checkFromId, isChecked, uncheckAll };
 };

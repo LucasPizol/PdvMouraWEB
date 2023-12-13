@@ -4,7 +4,6 @@
   width: 100%;
   background-color: #fff;
   overflow: hidden;
-  box-shadow: 0px 0px 35px 0px rgba(0, 0, 0, 0.162);
   flex: 1;
   padding: 0px 20px;
   font-family: $font;
@@ -15,7 +14,8 @@
   width: 100%;
   padding: 22px 22px;
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  gap: 45px;
   div {
     display: flex;
     align-items: center;
@@ -63,13 +63,12 @@
 .stockTableContent {
   overflow: auto;
 }
-
 .stockTableRow {
   display: grid;
   align-items: center;
   justify-content: space-between;
   grid-template-columns: 1fr 1fr 5fr 1fr;
-  padding: 16px;
+  padding: 8px;
   text-align: start;
   border-bottom: 1px solid #ccc;
 
@@ -82,20 +81,29 @@
     cursor: pointer;
   }
 }
-.filterHandler {
-  font-family: $font;
-  padding: 4px;
-  border-radius: 4px;
-  outline: none;
-  border: 1px solid #555;
-  width: 80%;
-  justify-self: center;
-}
 .stockTableHeader {
   @extend .stockTableRow;
   width: 100%;
   border-bottom: 1px solid #555;
   font-weight: bold;
+  background-color: #eee;
+}
+.stockTableHeaderFilter {
+  @extend .stockTableRow;
+  padding: 0;
+  width: 100%;
+  border: 0;
+  font-weight: bold;
+}
+.filterHandler {
+  font-family: $font;
+  padding: 4px 2px;
+  margin: 4px 0;
+  outline: none;
+  border: 1px solid #aaa;
+  color: #888;
+  width: 90%;
+  justify-self: center;
 }
 .footer {
   display: flex;
@@ -110,5 +118,12 @@
   align-self: flex-start;
   width: 25px;
   border: 0;
+  cursor: pointer;
+}
+.remove {
+  color: red;
+  display: flex;
+  align-items: center;
+  gap: 5px;
   cursor: pointer;
 }

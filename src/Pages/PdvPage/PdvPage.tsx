@@ -4,6 +4,7 @@ import styles from "./styles.module.scss";
 import Switch from "react-switch";
 import { ChangeEvent, useState } from "react";
 import { supabase } from "../../supabase";
+import Swal from "sweetalert2";
 
 const getDescription = (situation: boolean) => {
   return situation ? "APROVADO" : "REPROVADO";
@@ -33,25 +34,35 @@ const PdvPage = () => {
       })
       .eq("id", pdv.id);
 
+    if (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Atenção",
+        text: `Ocorreu um erro ao realizar o envio das informações: ${error.message}`,
+      });
+
+      return;
+    }
+
     navigate("/pdvDeSucesso");
   };
 
   return (
     <div className={styles.stockPanel}>
       <div className={styles.info}>
-        <h1 className={styles.title}>{pdv.customers.razao_social}</h1>
         <div>
-          <h5>Logradouro</h5>
-          <p>{pdv.customers.logradouro}</p>
+          <h1 className={styles.title}>{pdv.customers.razao_social}</h1>
+          <div>
+            <h5>Logradouro</h5>
+            <p>{pdv.customers.logradouro}</p>
+          </div>
+          <div>
+            <h5>Cidade</h5>
+            <p>{pdv.customers.cidade}</p>
+          </div>
         </div>
-
-        <div>
-          <h5>Cidade</h5>
-          <p>{pdv.customers.cidade}</p>
-        </div>
-
         {pdv.approved === null ? (
-          <>
+          <div className={styles.formApprove}>
             <div className={styles.aprovar}>
               <Switch onChange={handleChangeSwitch} checked={isApproved} />
               <h4>{isApproved ? "APROVAR" : "REPROVAR"}</h4>
@@ -65,7 +76,9 @@ const PdvPage = () => {
               onChange={handleChangeText}
               placeholder="Digite aqui um retorno"
               value={isApproved ? "OK" : text}
-              style={!isApproved ? { boxShadow: "0px 0px 4px 1px #006ec7" } : {}}
+              style={
+                !isApproved ? { boxShadow: "0px 0px 4px 1px #006ec7" } : {}
+              }
             />
             <button
               onClick={handleSubmit}
@@ -75,7 +88,7 @@ const PdvPage = () => {
             >
               Submeter
             </button>
-          </>
+          </div>
         ) : (
           getDescription(pdv.approved)
         )}
