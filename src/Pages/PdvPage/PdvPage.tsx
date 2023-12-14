@@ -26,6 +26,14 @@ const PdvPage = () => {
   };
 
   const handleSubmit = async () => {
+    const confirmAlert = await Swal.fire({
+      title: "Atenção!",
+      text: "Deseja enviar o feedback?",
+      icon: "warning",
+    });
+
+    if (confirmAlert.isDenied) return;
+
     const { error } = await supabase
       .from("pdvs")
       .update({

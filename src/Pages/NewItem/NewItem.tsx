@@ -1,13 +1,12 @@
 import { supabase } from "../../supabase";
 import { useQuery } from "react-query";
 import styles from "./styles.module.scss";
-import { useContext, useEffect } from "react";
-import { UserContext } from "../../routes";
 import { useLocation, useNavigate } from "react-router-dom";
 import web_developer from "../../assets/web_developer.svg";
 import { useForm } from "../../hooks/useForm";
 import { MdArrowBack } from "react-icons/md";
 import Swal from "sweetalert2";
+import { useAuthContext } from "../../context/AuthContext";
 
 const getCategories = async () => {
   const { data, error } = await supabase.from("categoria").select();
@@ -21,7 +20,8 @@ const initialFields = {
 };
 
 export const NewItem = () => {
-  const user = useContext(UserContext);
+  const { user } = useAuthContext();
+
   const navigate = useNavigate();
   const { data } = useQuery("getCategories", getCategories);
 
@@ -36,10 +36,6 @@ export const NewItem = () => {
     : null;
 
   const [fields, changeField] = useForm(productDataFields || initialFields);
-
-  useEffect(() => {
-    //if (!user) navigate("/auth/login");
-  }, [user, productData]);
 
   const handleRegister = async (e: any) => {
     e.preventDefault();
@@ -91,7 +87,6 @@ export const NewItem = () => {
       Toast.fire({
         icon: "success",
         title: "Cadastrado com sucesso!",
-        
       });
 
       navigate("/");

@@ -1,12 +1,13 @@
-import { useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { NavLink } from "react-router-dom";
 import styles from "./styles.module.scss";
 import { GiCardboardBoxClosed } from "react-icons/gi";
 import { supabase } from "../../supabase";
 import Swal from "sweetalert2";
 import { MdAccountCircle, MdStore, MdPerson4, MdListAlt } from "react-icons/md";
 import { VscSignOut } from "react-icons/vsc";
-import { UserContext } from "../../routes";
+import { useAuthContext } from "../../context/AuthContext";
+import { MdMenu } from "react-icons/md";
 
 const emailToName = (email: string) => {
   return `${email.split("@")[0].split(".")[0].toUpperCase()} ${email
@@ -16,8 +17,8 @@ const emailToName = (email: string) => {
 };
 
 export const Menu = () => {
-  const [active, setActive] = useState<number>(0);
-  const userData = useContext(UserContext);
+  const { user } = useAuthContext();
+  const [isActive, setIsActive] = useState<boolean>(false);
 
   const signOut = async () => {
     const swalAlert = await Swal.fire({
@@ -38,69 +39,74 @@ export const Menu = () => {
   return (
     <aside className={styles.menuContainer}>
       <header className={styles.header}>
-        <h2>{userData ? emailToName(userData![0].email) : ""}</h2>
+        <h2>{user ? emailToName(user![0].email) : ""}</h2>
+        <MdMenu
+          size={35}
+          className={styles.menu}
+          onClick={() => {
+            setIsActive(!isActive);
+          }}
+        />
       </header>
-      <nav>
+      <nav
+        style={{ transition: "0.5s" }}
+        className={isActive ? styles.menuNavActive : styles.menuNav}
+      >
         <div className={styles.navDivContent}>
           <span></span>
           <p className={styles.navDiv}>Estoque</p>
           <span></span>
         </div>
-        <Link
-          style={
-            active === 0 ? { backgroundColor: "#006ec7", color: "#fff" } : {}
-          }
+        <NavLink
           to="/"
-          onClick={() => setActive(0)}
+          className={({ isActive }) =>
+            isActive ? styles.navActive : styles.navRef
+          }
         >
           <GiCardboardBoxClosed size={20} /> Estoque
-        </Link>
-        <Link
-          style={
-            active === 1 ? { backgroundColor: "#006ec7", color: "#fff" } : {}
+        </NavLink>
+        <NavLink
+          className={({ isActive }) =>
+            isActive ? styles.navActive : styles.navRef
           }
           to="/favorecidos"
-          onClick={() => setActive(1)}
         >
           <MdAccountCircle size={20} /> Favorecidos
-        </Link>
-        <Link
-          style={
-            active === 2 ? { backgroundColor: "#006ec7", color: "#fff" } : {}
+        </NavLink>
+        <NavLink
+          className={({ isActive }) =>
+            isActive ? styles.navActive : styles.navRef
           }
           to="/historico"
-          onClick={() => setActive(2)}
         >
           <MdListAlt size={20} /> Histórico
-        </Link>
+        </NavLink>
         <div className={styles.navDivContent}>
           <span></span>
           <p className={styles.navDiv}>Trade</p>
           <span></span>
         </div>
-        <Link
-          style={
-            active === 3 ? { backgroundColor: "#006ec7", color: "#fff" } : {}
+        <NavLink
+          className={({ isActive }) =>
+            isActive ? styles.navActive : styles.navRef
           }
           to="/customers"
-          onClick={() => setActive(3)}
         >
           <MdPerson4 size={20} /> Clientes
-        </Link>
-        <Link
-          style={
-            active === 4 ? { backgroundColor: "#006ec7", color: "#fff" } : {}
+        </NavLink>
+        <NavLink
+          className={({ isActive }) =>
+            isActive ? styles.navActive : styles.navRef
           }
           to="/pdvDeSucesso"
-          onClick={() => setActive(4)}
         >
           <MdStore size={20} /> PDVs de Sucesso
-        </Link>
+        </NavLink>
+        <button className={styles.signOut} onClick={signOut}>
+          <VscSignOut />
+          Sair
+        </button>
       </nav>
-      <button className={styles.signOut} onClick={signOut}>
-        <VscSignOut />
-        Sair
-      </button>
     </aside>
   );
 };

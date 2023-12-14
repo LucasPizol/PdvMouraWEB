@@ -27,12 +27,15 @@
   gap: 20px;
   flex: 3;
   max-height: 100%;
+  align-items: center;
 }
-
 .image {
-  height: 100%;
+  max-width: 49%;
+  max-height: 100%;
+  height: max-content;
   border-radius: 10px;
-  flex: 1;
+  border: 2px solid #aaa;
+  object-fit: contain;
 }
 .formApprove {
   display: flex;

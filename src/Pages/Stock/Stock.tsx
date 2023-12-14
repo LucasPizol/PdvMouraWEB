@@ -1,14 +1,14 @@
-import { useState, ChangeEvent, useEffect, useContext } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
 import styles from "./styles.module.scss";
 import { MdCheckCircleOutline, MdBlock, MdEditSquare } from "react-icons/md";
 import { IoAlertCircleOutline } from "react-icons/io5";
 import { supabase } from "../../supabase";
 import { useQuery } from "react-query";
 import { Link, useNavigate } from "react-router-dom";
-import { UserContext } from "../../routes";
 import { useCheck } from "../../hooks/useCheck";
 import { IoTrashSharp } from "react-icons/io5";
 import Swal from "sweetalert2";
+import { useAuthContext } from "../../context/AuthContext";
 
 export interface Material {
   id: number;
@@ -29,12 +29,12 @@ const getCategories = async () => {
 };
 
 export const Stock = () => {
-  const userData = useContext(UserContext);
+  const { user } = useAuthContext();
 
   const getItemsFromStock = async () => {
-    if (!userData) return;
+    if (!user) return;
     //@ts-ignore
-    const equipe: { id: number; empresas: number } = userData[0].equipe;
+    const equipe: { id: number; empresas: number } = user[0].equipe;
 
     const { data, error } = await supabase
       .from("estoque")
@@ -58,10 +58,6 @@ export const Stock = () => {
     categoria: 0,
   });
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!userData) navigate("/auth/login");
-  }, [userData]);
 
   const [materials, setMaterials] = useState<Material[] | null | undefined>();
   const { checked, checkAll, checkFromId, isChecked } = useCheck(materials);

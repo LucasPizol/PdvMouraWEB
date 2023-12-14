@@ -1,12 +1,13 @@
-import { ChangeEvent, useContext, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import styles from "./styles.module.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
-import { UserContext, UserType } from "../../routes";
+import { UserType } from "../../routes";
 import { supabase } from "../../supabase";
 import { useCheck } from "../../hooks/useCheck";
 import { IoTrashSharp } from "react-icons/io5";
 import Swal from "sweetalert2";
+import { useAuthContext } from "../../context/AuthContext";
 
 interface Historico {
   id: any;
@@ -26,10 +27,10 @@ interface Historico {
   tipo: any;
   created_at: any;
 }
-const getHistorico = async (userData: UserType) => {
-  if (!userData) return;
+const getHistorico = async (user: UserType) => {
+  if (!user) return;
   //@ts-ignore
-  const equipe: { id: number; empresas: number } = userData[0].equipe;
+  const equipe: { id: number; empresas: number } = user[0].equipe;
 
   const { data, error } = await supabase
     .from("historico")
@@ -45,21 +46,16 @@ const getHistorico = async (userData: UserType) => {
     .eq("id_empresa", equipe.empresas)
     .order("created_at", { ascending: false });
 
-  console.log(typeof data);
-
   return { data, error };
 };
 
 const today = new Date();
-today.setDate(today.getDate() + 1);
 
 export const Historic = () => {
-  const userData = useContext(UserContext);
+  const { user } = useAuthContext();
   const navigate = useNavigate();
 
-  const { data, refetch } = useQuery("getHistorico", () =>
-    getHistorico(userData)
-  );
+  const { data, refetch } = useQuery("getHistorico", () => getHistorico(user));
   const [favorecidos, setFavorecidos] = useState<
     Historico[] | null | undefined
   >();
@@ -71,7 +67,9 @@ export const Historic = () => {
   }>({
     favorecido: "",
     item: "",
-    firstDate: new Date(2000, 1, 1).toISOString().split("T")[0],
+    firstDate: new Date(today.getFullYear(), today.getMonth(), 1)
+      .toISOString()
+      .split("T")[0],
     lastDate: today.toISOString().split("T")[0],
   });
 
@@ -177,7 +175,7 @@ export const Historic = () => {
   };
 
   useEffect(() => {
-    if (!userData) navigate("/auth/login");
+    if (!user) navigate("/auth/login");
     setFavorecidos(data?.data);
   }, [data]);
 
@@ -197,6 +195,7 @@ export const Historic = () => {
               name="firstDate"
               id="firstDate"
               onChange={handleSearch}
+              value={fields.firstDate}
             />
           </div>
           <div>
@@ -206,6 +205,7 @@ export const Historic = () => {
               name="lastDate"
               id="lastDate"
               onChange={handleSearch}
+              value={fields.lastDate}
             />
           </div>
         </div>

@@ -3,7 +3,6 @@
 .stockPanel {
   width: 100%;
   background-color: #fff;
-  overflow: hidden;
   flex: 1;
   padding: 0px 20px;
   font-family: $font;
@@ -56,6 +55,7 @@
   flex-direction: column;
   height: 50%;
   flex: 1;
+  min-width: 800px;
 }
 
 .stockTableContent {

@@ -1,17 +1,7 @@
-import { useContext, useEffect } from "react";
 import { Form } from "./Form/Form";
-import { UserContext } from "../../routes";
-import { useNavigate } from "react-router-dom";
 import styles from "./styles.module.scss";
 
 export const Login = () => {
-  const user = useContext(UserContext);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user) navigate("/");
-  }, [user]);
-
   return (
     <main className={styles.authContainer}>
       <div className={styles.container}>
@@ -21,7 +11,10 @@ export const Login = () => {
             <p>O aplicativo para facilitar o dia a dia do staff de vendas</p>
           </div>
           <Form />
-          <img src="https://logodownload.org/wp-content/uploads/2017/08/moura-logo.png" alt="logo baterias moura" />
+          <img
+            src="https://logodownload.org/wp-content/uploads/2017/08/moura-logo.png"
+            alt="logo baterias moura"
+          />
         </div>
         <img
           className={styles.asideImage}

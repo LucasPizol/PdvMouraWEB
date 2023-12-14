@@ -27,14 +27,13 @@
   display: flex;
   align-items: flex-end;
 }
-.menuContainer nav {
+.menuNav {
   padding: 20px;
   width: 100%;
   display: flex;
   flex-direction: column;
   flex: 1;
 }
-
 .navDivContent {
   display: flex;
   align-items: center;
@@ -55,7 +54,7 @@
   }
 }
 
-.menuContainer nav a {
+.navRef {
   color: $secondary-color;
   text-decoration: none;
   font-family: var(--font);
@@ -65,9 +64,12 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  &:hover {
-    background-color: var(--secondary-color);
-  }
+}
+
+.navActive {
+  @extend .navRef;
+  background-color: $secondary-color;
+  color: white;
 }
 
 .signOut {
@@ -89,5 +91,50 @@
   &:hover {
     background-color: red;
     color: white;
+  }
+}
+.menu {
+  display: none;
+}
+@media (max-width: 850px) {
+  .menuContainer {
+    max-width: 100%;
+    width: 100%;
+    position: fixed;
+    height: 50px;
+    overflow: visible;
+  }
+  .header {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .menu {
+    display: block;
+  }
+  .menuNav {
+    position: absolute;
+    overflow: auto;
+    right: 0;
+    top: 0;
+    z-index: 999;
+    width: 100%;
+    max-width: 220px;
+    padding: 20px;
+    transform: translateY(50px) translateX(240px);
+    background-color: white;
+    height: 100svh;
+  }
+  .menuNavActive {
+    width: 100%;
+    right: 0;
+    max-width: 220px;
+    height: 100svh;
+    position: absolute;
+    padding: 20px;
+    background-color: white;
+    transform: translateY(50px);
+    box-shadow: 3px 10px 10px 2px rgba(0, 0, 0, 0.514);
   }
 }

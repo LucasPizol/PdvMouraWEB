@@ -1,15 +1,15 @@
-import { ChangeEvent, useContext, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import styles from "./styles.module.scss";
-import { useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
-import { UserContext, UserType } from "../../routes";
+import { UserType } from "../../routes";
 import { supabase } from "../../supabase";
 import FlatList from "flatlist-react";
+import { useAuthContext } from "../../context/AuthContext";
 
-const getUsers = async (userData: UserType) => {
-  if (!userData) return;
+const getUsers = async (user: UserType) => {
+  if (!user) return;
   //@ts-ignore
-  const equipe: { id: number; empresas: number } = userData[0].equipe;
+  const equipe: { id: number; empresas: number } = user[0].equipe;
   const { data, error } = await supabase
     .from("users")
     .select("cod, equipe: id_equipe(id_empresa)")
@@ -20,10 +20,10 @@ const getUsers = async (userData: UserType) => {
   return { data, error };
 };
 
-const getData = async (userData: UserType) => {
-  if (!userData) return;
+const getData = async (user: UserType) => {
+  if (!user) return;
   //@ts-ignore
-  const equipe: { id: number; empresas: number } = userData[0].equipe;
+  const equipe: { id: number; empresas: number } = user[0].equipe;
 
   const { data, error } = await supabase
     .from("customers")
@@ -49,6 +49,7 @@ const TableRow = ({ cod, razao_social, cidade, users, pdvs }: any) => {
 };
 
 export const Customers = () => {
+  const { user } = useAuthContext();
   const [customers, setCustomers] = useState<any | null | undefined>();
   const [fields, setFields] = useState({
     cod: "",
@@ -58,10 +59,8 @@ export const Customers = () => {
     pdv: "Todos",
   });
 
-  const userData = useContext(UserContext);
-  const navigate = useNavigate();
-  const users = useQuery("getSellers", () => getUsers(userData));
-  const customersList = useQuery("getCustomersPage", () => getData(userData));
+  const users = useQuery("getSellers", () => getUsers(user));
+  const customersList = useQuery("getCustomersPage", () => getData(user));
 
   const handleSearch = (
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
@@ -100,7 +99,6 @@ export const Customers = () => {
   };
 
   useEffect(() => {
-    if (!userData) navigate("/auth/login");
     setCustomers(customersList?.data?.data);
   }, [customersList.data]);
 

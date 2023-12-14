@@ -1,3 +1,4 @@
+import { AuthProvider } from "./context/AuthProvider";
 import { RoutesApp } from "./routes";
 import "./styles/default.module.scss";
 import "./styles/styles.css";
@@ -14,7 +15,9 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <RoutesApp />
+      <AuthProvider>
+        <RoutesApp />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

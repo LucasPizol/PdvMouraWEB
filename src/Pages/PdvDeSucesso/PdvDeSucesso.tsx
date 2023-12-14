@@ -1,10 +1,11 @@
-import { ChangeEvent, useContext, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import styles from "./styles.module.scss";
-import { Link, useNavigate } from "react-router-dom";
-import { MdSearch, MdRemoveRedEye } from "react-icons/md";
-import { UserContext, UserType } from "../../routes";
+import { useNavigate } from "react-router-dom";
+import { MdRemoveRedEye } from "react-icons/md";
+import { UserType } from "../../routes";
 import { supabase } from "../../supabase";
 import { useQuery } from "react-query";
+import { useAuthContext } from "../../context/AuthContext";
 
 export interface PDVdeSucesso {
   customers: {
@@ -24,10 +25,10 @@ const getDescription = (situation: boolean) => {
   return situation ? "APROVADO" : "REPROVADO";
 };
 
-const getUsers = async (userData: UserType) => {
-  if (!userData) return;
+const getUsers = async (user: UserType) => {
+  if (!user) return;
   //@ts-ignore
-  const equipe: { id: number; empresas: number } = userData[0].equipe;
+  const equipe: { id: number; empresas: number } = user[0].equipe;
 
   const { data, error } = await supabase
     .from("users")
@@ -38,9 +39,9 @@ const getUsers = async (userData: UserType) => {
   return { data, error };
 };
 
-const getCustomers = async (userData: UserType) => {
-  if (!userData) return;
-  const usersData = await getUsers(userData);
+const getCustomers = async (user: UserType) => {
+  if (!user) return;
+  const usersData = await getUsers(user);
 
   const { data } = await supabase
     .from("pdvs")
@@ -57,7 +58,7 @@ const getCustomers = async (userData: UserType) => {
 };
 
 export const PdvDeSucesso = () => {
-  const userData = useContext(UserContext);
+  const { user } = useAuthContext();
   const navigate = useNavigate();
   const [fields, setFields] = useState({
     cod: "",
@@ -67,9 +68,9 @@ export const PdvDeSucesso = () => {
     situacao: "Todos",
   });
 
-  const users = useQuery("getSellers", () => getUsers(userData));
+  const users = useQuery("getSellers", () => getUsers(user));
   const customersData = useQuery("getCustomersDataPdv", () =>
-    getCustomers(userData)
+    getCustomers(user)
   );
   const [customers, setCustomers] = useState<any>();
 
@@ -121,20 +122,6 @@ export const PdvDeSucesso = () => {
     <div className={styles.stockPanel}>
       <header className={styles.stockPanelHeader}>
         <h1>PDVs de Sucesso</h1>
-
-        <nav>
-          <Link to="/novo/pedido">Novo pedido</Link>
-          <div>
-            <input
-              placeholder="Procure um nome / item"
-              type="search"
-              //onChange={handleSearch}
-              name=""
-              id=""
-            />
-            <MdSearch className={styles.searchIcon} />
-          </div>
-        </nav>
       </header>
       <div className={styles.stockTable}>
         <div className={styles.stockTableHeader}>

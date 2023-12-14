@@ -1,23 +1,24 @@
-import { ChangeEvent, useContext, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import styles from "./styles.module.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { MdEditSquare } from "react-icons/md";
 import { useQuery } from "react-query";
-import { UserContext, UserType } from "../../routes";
+import { UserType } from "../../routes";
 import { supabase } from "../../supabase";
 import { useCheck } from "../../hooks/useCheck";
 import Swal from "sweetalert2";
 import { IoTrashSharp } from "react-icons/io5";
+import { useAuthContext } from "../../context/AuthContext";
 
 interface Favorecido {
   id: number;
   favorecido: string;
 }
 
-const getFavorecidos = async (userData: UserType) => {
-  if (!userData) return;
+const getFavorecidos = async (user: UserType) => {
+  if (!user) return;
   //@ts-ignore
-  const equipe: { id: number; empresas: number } = userData[0].equipe;
+  const equipe: { id: number; empresas: number } = user[0].equipe;
 
   const { data, error } = await supabase
     .from("favorecido")
@@ -31,8 +32,10 @@ const getFavorecidos = async (userData: UserType) => {
 };
 
 export const Favorecidos = () => {
+  const { user } = useAuthContext();
+
   const { data, refetch } = useQuery("getFavorecidos", () =>
-    getFavorecidos(userData)
+    getFavorecidos(user)
   );
   const [favorecidos, setFavorecidos] = useState<
     Favorecido[] | null | undefined
@@ -40,7 +43,6 @@ export const Favorecidos = () => {
   const [fields, setFields] = useState({ favorecido: "" });
   const { checked, checkAll, checkFromId, isChecked, uncheckAll } =
     useCheck(favorecidos);
-  const userData = useContext(UserContext);
   const navigate = useNavigate();
 
   const handleSearch = (
@@ -89,7 +91,6 @@ export const Favorecidos = () => {
   };
 
   useEffect(() => {
-    if (!userData) navigate("/auth/login");
     setFavorecidos(data?.data);
   }, [data]);
 
@@ -110,7 +111,6 @@ export const Favorecidos = () => {
           />
           {checked.length === 0 ? (
             <>
-              <p>#</p>
               <p>Favorecido</p>
               <p>Editar</p>
             </>
@@ -127,7 +127,6 @@ export const Favorecidos = () => {
         </div>
 
         <div className={styles.stockTableHeaderFilter}>
-          <p></p>
           <p></p>
           <input
             className={styles.filterHandler}
@@ -147,7 +146,6 @@ export const Favorecidos = () => {
                 checked={isChecked(id)}
                 onChange={() => checkFromId(id)}
               />
-              <p>{id}</p>
               <p>{favorecido}</p>
               <button
                 className={styles.button}

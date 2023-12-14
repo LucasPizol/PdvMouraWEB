@@ -1,19 +1,19 @@
 import { supabase } from "../../supabase";
 import styles from "./styles.module.scss";
-import { useContext, useEffect } from "react";
-import { UserContext } from "../../routes";
 import { useLocation, useNavigate } from "react-router-dom";
 import web_developer from "../../assets/web_developer.svg";
 import { useForm } from "../../hooks/useForm";
 import { MdArrowBack } from "react-icons/md";
 import Swal from "sweetalert2";
+import { useAuthContext } from "../../context/AuthContext";
 
 const initialFields = {
   favorecido: "",
 };
 
 export const NewFavorecido = () => {
-  const user = useContext(UserContext);
+  const { user } = useAuthContext();
+
   const navigate = useNavigate();
   const favorecidoData = useLocation();
 
@@ -24,10 +24,6 @@ export const NewFavorecido = () => {
     : null;
 
   const [fields, changeField] = useForm(favorecidoDataFields || initialFields);
-
-  useEffect(() => {
-    //if (!user) navigate("/auth/login");
-  }, [user]);
 
   const handleRegister = async (e: any) => {
     e.preventDefault();

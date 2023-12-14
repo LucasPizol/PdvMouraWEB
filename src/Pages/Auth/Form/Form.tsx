@@ -26,7 +26,7 @@ export const Form = () => {
       });
     }
 
-    window.location.href = "/"
+    window.location.href = "/";
 
     return { data, error };
   };
@@ -37,14 +37,28 @@ export const Form = () => {
         <label htmlFor="email">Login</label>
         <div className={styles.inputDiv}>
           <MdPerson size={20} color="#555" />
-          <input type="email" name="email" id="email" placeholder="Usuário" onChange={changeField} value={fields.email} />
+          <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="Usuário"
+            onChange={changeField}
+            value={fields.email}
+          />
         </div>
       </div>
       <div className={styles.inputGroup}>
         <label htmlFor="password">Senha</label>
         <div className={styles.inputDiv}>
           <MdLock size={20} color="#555" />
-          <input type="password" name="password" id="password" placeholder="****" onChange={changeField} value={fields.password} />
+          <input
+            type="password"
+            name="password"
+            id="password"
+            placeholder="****"
+            onChange={changeField}
+            value={fields.password}
+          />
         </div>
       </div>
       <button className={styles.button} onClick={handleLogin}>

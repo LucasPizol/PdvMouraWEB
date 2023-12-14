@@ -23,4 +23,15 @@
   max-height: 150px;
   object-fit: cover;
   flex: 1;
+  object-position: 8%;
+}
+
+@media (max-width: 850px) {
+  .grid {
+    flex-direction: column;
+  }
+  .container {
+    margin-left: 0;
+    margin-top: 50px;
+  }
 }
