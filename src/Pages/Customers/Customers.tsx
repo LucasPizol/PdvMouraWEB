@@ -13,8 +13,8 @@ const getUsers = async (user: UserType) => {
   const { data, error } = await supabase
     .from("users")
     .select("cod, equipe: id_equipe(id_empresa)")
+    .ilike("cod", `%${String(equipe.id).slice(0, 3)}%`)
     .eq("role", "salesperson")
-    .eq("equipe.id_empresa", equipe.empresas)
     .order("cod");
 
   return { data, error };
@@ -28,11 +28,13 @@ const getData = async (user: UserType) => {
   const { data, error } = await supabase
     .from("customers")
     .select(
-      "cod,razao_social,cidade,users!inner(cod, equipe: id_equipe(id_empresa)),pdvs (id)"
+      "cod,razao_social,cidade,users!inner(cod, equipe!users_id_equipe_fkey(id_empresa)),pdvs (id)"
     )
     .order("razao_social")
-    .eq("users.equipe.id_empresa", equipe.empresas);
+    .ilike("users.cod", `%${String(equipe.id).slice(0, 3)}%`);
 
+  console.log(String(60101).slice(0, 2));
+  console.log(data);
   return { data, error };
 };
 
