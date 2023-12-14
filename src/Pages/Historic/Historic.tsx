@@ -5,13 +5,26 @@ import { useQuery } from "react-query";
 import { UserContext, UserType } from "../../routes";
 import { supabase } from "../../supabase";
 import { useCheck } from "../../hooks/useCheck";
+import { IoTrashSharp } from "react-icons/io5";
+import Swal from "sweetalert2";
 
 interface Historico {
-  id: number;
-  favorecido: string;
-  item: string;
-  created_at: Date;
-  quantidade: number;
+  id: any;
+  favorecido: {
+    favorecido: any;
+  }[];
+  item: {
+    id: any;
+    item: any;
+    qtd_disponivel: any;
+    estoque_minimo: any;
+    id_categoria: any;
+    id_empresa: any;
+    created_at: any;
+  }[];
+  quantidade: any;
+  tipo: any;
+  created_at: any;
 }
 const getHistorico = async (userData: UserType) => {
   if (!userData) return;
@@ -23,7 +36,7 @@ const getHistorico = async (userData: UserType) => {
     .select(
       `id,
       favorecido:id_favorecido(favorecido),
-      item:id_item(item),
+      item:id_item(id, item, qtd_disponivel, estoque_minimo, id_categoria, id_empresa, created_at),
       quantidade,
       tipo,
       created_at
@@ -31,20 +44,10 @@ const getHistorico = async (userData: UserType) => {
     )
     .eq("id_empresa", equipe.empresas)
     .order("created_at", { ascending: false });
-  //@ts-ignore
-  const formattedData: Historico[] = data?.map((order) => {
-    return {
-      //@ts-ignore
-      favorecido: order?.favorecido?.favorecido || "Entrada",
-      //@ts-ignore
-      item: order.item.item,
-      quantidade: order.quantidade,
-      created_at: order.created_at,
-      id: order.id,
-    };
-  });
 
-  return { data: formattedData, error };
+  console.log(typeof data);
+
+  return { data, error };
 };
 
 const today = new Date();
@@ -54,7 +57,9 @@ export const Historic = () => {
   const userData = useContext(UserContext);
   const navigate = useNavigate();
 
-  const { data } = useQuery("getHistorico", () => getHistorico(userData));
+  const { data, refetch } = useQuery("getHistorico", () =>
+    getHistorico(userData)
+  );
   const [favorecidos, setFavorecidos] = useState<
     Historico[] | null | undefined
   >();
@@ -70,7 +75,8 @@ export const Historic = () => {
     lastDate: today.toISOString().split("T")[0],
   });
 
-  const { checked, checkAll, checkFromId, isChecked } = useCheck(favorecidos);
+  const { checked, checkAll, checkFromId, isChecked, uncheckAll } =
+    useCheck(favorecidos);
 
   const handleSearch = (
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
@@ -88,12 +94,13 @@ export const Historic = () => {
     setFields(field);
 
     const filteredMaterials = data?.data?.filter((item: Historico) => {
-      const checkItem = item.item
-        .toLowerCase()
+      //@ts-ignore
+      const checkItem = item?.item.item
+        ?.toLowerCase()
         .includes(field.item.toLowerCase());
-      const checkFavorecido = item.favorecido
-        .toLowerCase()
-        .includes(field.favorecido.toLowerCase());
+      const checkFavorecido =
+        item.favorecido ||
+        "Entrada".toLowerCase().includes(field.favorecido.toLowerCase());
 
       const checkData =
         //@ts-ignore
@@ -107,32 +114,67 @@ export const Historic = () => {
     setFavorecidos(filteredMaterials);
   };
 
-  // const handleRemoveItems = async () => {
-  //   const confirm = await Swal.fire({
-  //     title: "Atenção!",
-  //     icon: "warning",
-  //     text: `Deseja realmente exluir ${checked.length} item(ns)? Todo o estoque será adicionado ao produto novamente.`,
-  //     confirmButtonText: "Sim",
-  //     denyButtonText: "Não",
-  //     showDenyButton: true,
-  //   });
+  const handleRemoveItems = async () => {
+    const confirm = await Swal.fire({
+      title: "Atenção!",
+      icon: "warning",
+      text: `Deseja realmente exluir ${checked.length} item(ns)? Todo o estoque será adicionado ao produto novamente.`,
+      confirmButtonText: "Sim",
+      denyButtonText: "Não",
+      showDenyButton: true,
+    });
 
-  //   if (confirm.isConfirmed) {
-  //     const { error } = await supabase
-  //       .from("favorecido")
-  //       .delete()
-  //       .in("id", checked);
-  //     if (error) {
-  //       return Swal.fire({
-  //         icon: "error",
-  //         title: "Ocorreu um erro",
-  //         text: "Verifique se já foi realizada algum pedido para este favorecido.",
-  //       });
-  //     }
-  //     uncheckAll();
-  //     refetch();
-  //   }
-  // };
+    const formatted = checked.map((id) => {
+      const item = data?.data?.find(
+        (historico: Historico) => historico.id === id
+      );
+
+      if (!item) return;
+
+      return {
+        //@ts-ignore
+        id: item.item.id,
+        //@ts-ignore
+        item: item.item.item,
+        //@ts-ignore
+        estoque_minimo: item.item.estoque_minimo,
+        //@ts-ignore
+        id_categoria: item.item.id_categoria,
+        //@ts-ignore
+        created_at: item.item.created_at,
+        //@ts-ignore
+
+        id_empresa: item.item.id_empresa,
+        qtd_disponivel:
+          //@ts-ignore
+          item?.favorecido?.favorecido === null
+            ? //@ts-ignore
+              Number(item.item.qtd_disponivel) + item.quantidade
+            : //@ts-ignore
+
+              Number(item.item.qtd_disponivel) - item.quantidade,
+      };
+    });
+    if (confirm.isConfirmed) {
+      const favorecidoResponse = await supabase
+        .from("historico")
+        .delete()
+        .in("id", checked);
+      const estoqueResponse = await supabase.from("estoque").upsert(formatted);
+
+      console.log(favorecidoResponse.data);
+      console.log(estoqueResponse.error);
+
+      if (favorecidoResponse.error || estoqueResponse.error) {
+        return Swal.fire({
+          icon: "error",
+          title: "Ocorreu um erro",
+        });
+      }
+      uncheckAll();
+      refetch();
+    }
+  };
 
   useEffect(() => {
     if (!userData) navigate("/auth/login");
@@ -177,10 +219,23 @@ export const Historic = () => {
             onChange={checkAll}
             checked={checked.length === favorecidos?.length}
           />
-          <p>Item</p>
-          <p>Favorecido</p>
-          <p>Quantidade</p>
-          <p>Data</p>
+          {checked.length === 0 ? (
+            <>
+              <p>Item</p>
+              <p>Favorecido</p>
+              <p>Quantidade</p>
+              <p>Data</p>
+            </>
+          ) : (
+            <p
+              style={{ width: "200px" }}
+              className={styles.remove}
+              onClick={handleRemoveItems}
+            >
+              <IoTrashSharp size={20} />
+              {`Remover ${checked.length} item(ns)`}
+            </p>
+          )}
         </div>
         <div className={styles.stockTableHeaderFilter}>
           <p></p>
@@ -200,7 +255,7 @@ export const Historic = () => {
         </div>
         <div className={styles.stockTableContent}>
           {favorecidos?.map(
-            ({ id, favorecido, item, created_at, quantidade }) => (
+            ({ id, favorecido, item, created_at, quantidade }: Historico) => (
               <div key={id} className={styles.stockTableRow}>
                 <input
                   type="checkbox"
@@ -209,8 +264,18 @@ export const Historic = () => {
                   checked={isChecked(id)}
                   onChange={() => checkFromId(id)}
                 />
-                <p>{item}</p>
-                <p>{favorecido}</p>
+                <p>
+                  {
+                    //@ts-ignore
+                    item?.item
+                  }
+                </p>
+                <p>
+                  {
+                    //@ts-ignore
+                    favorecido?.favorecido || "Entrada"
+                  }
+                </p>
                 <p>{quantidade}</p>
                 <p>
                   {new Date(created_at).toLocaleDateString("pt-br", {

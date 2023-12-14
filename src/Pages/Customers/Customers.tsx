@@ -1,6 +1,6 @@
 import { ChangeEvent, useContext, useEffect, useState } from "react";
 import styles from "./styles.module.scss";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
 import { UserContext, UserType } from "../../routes";
 import { supabase } from "../../supabase";
@@ -108,7 +108,6 @@ export const Customers = () => {
     <div className={styles.stockPanel}>
       <header className={styles.stockPanelHeader}>
         <h1>Clientes</h1>
-        <Link to="/novo/pedido">Novo pedido</Link>
       </header>
       <div className={styles.stockTable}>
         <div className={styles.stockTableHeader}>

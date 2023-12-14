@@ -64,7 +64,7 @@ export const NewPedido = () => {
       denyButtonText: "Não",
     });
 
-    if (swalAlert) {
+    if (swalAlert.isConfirmed) {
       const addToHistoric = await supabase.from("historico").insert({
         ...fields,
         id_favorecido: fields.tipo === "Entrada" ? null : fields.id_favorecido,
@@ -75,9 +75,6 @@ export const NewPedido = () => {
       const findItem = data?.estoqueItems?.find(
         (item) => Number(item.id) === Number(fields.id_item)
       );
-
-      console.log(data?.estoqueItems);
-      console.log(Number(fields.id_item));
 
       const updateStock = await supabase
         .from("estoque")

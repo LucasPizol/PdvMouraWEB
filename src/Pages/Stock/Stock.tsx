@@ -10,7 +10,7 @@ import { useCheck } from "../../hooks/useCheck";
 import { IoTrashSharp } from "react-icons/io5";
 import Swal from "sweetalert2";
 
-interface Material {
+export interface Material {
   id: number;
   item: string;
   estoque_minimo: number;
@@ -190,12 +190,12 @@ export const Stock = () => {
                 <p>{estoque_minimo}</p>
                 <p>{qtd_disponivel}</p>
                 <p>
-                  {qtd_disponivel >= estoque_minimo ? (
-                    <MdCheckCircleOutline size={25} color="#1646E6" />
-                  ) : qtd_disponivel !== 0 ? (
-                    <IoAlertCircleOutline size={25} color="#FF9900" />
-                  ) : (
+                  {qtd_disponivel == 0 ? (
                     <MdBlock size={25} color="#f00" />
+                  ) : qtd_disponivel >= estoque_minimo ? (
+                    <MdCheckCircleOutline size={25} color="#1646E6" />
+                  ) : (
+                    <IoAlertCircleOutline size={25} color="#FF9900" />
                   )}
                 </p>
                 <button
