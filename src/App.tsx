@@ -1,5 +1,5 @@
 import { AuthProvider } from "./context/AuthProvider";
-import { RoutesApp } from "./routes";
+import { RoutesApp } from "./routes/routes";
 import "./styles/default.module.scss";
 import "./styles/styles.css";
 

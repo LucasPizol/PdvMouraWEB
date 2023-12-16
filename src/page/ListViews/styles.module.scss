@@ -1,0 +1,98 @@
+@import "../../styles/colors.module.scss";
+
+.mainGrid {
+  width: 100%;
+  background-color: #fff;
+  overflow: hidden;
+  box-shadow: 0px 0px 35px 0px rgba(0, 0, 0, 0.162);
+  flex: 1;
+  padding: 0px 20px;
+  font-family: $font;
+  display: flex;
+  flex-direction: column;
+}
+.gridHeader {
+  width: 100%;
+  padding: 22px 22px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 45px;
+  align-items: center;
+  a {
+    color: $primary-color;
+  }
+}
+.table {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 50%;
+  flex: 1;
+}
+.tableContent {
+  overflow: auto;
+}
+.tableRow {
+  display: grid;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+
+  p:nth-child(2) {
+    justify-content: flex-start;
+    align-items: flex-start;
+    text-align: start;
+  }
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+}
+.tableHeader {
+  @extend .tableRow;
+  background-color: #eee;
+  width: 100%;
+  border-bottom: 1px solid #555;
+  font-weight: bold;
+}
+.tableFilter {
+  @extend .tableRow;
+  padding: 0;
+  width: 100%;
+  border: 0;
+  font-weight: bold;
+}
+.button {
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.titleDiv {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 45px;
+}
+.periodo {
+  margin-left: 150px;
+  display: flex;
+  gap: 30px;
+  div {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  input {
+    font-family: $font;
+    padding: 4px 2px;
+    margin: 4px 0;
+    outline: none;
+    border: 1px solid #aaa;
+    color: #888;
+    width: 90%;
+    justify-self: center;
+  }
+}

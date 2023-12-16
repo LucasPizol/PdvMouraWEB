@@ -1,6 +1,7 @@
 import { AuthContext } from "./AuthContext";
 import { supabase } from "../supabase";
-import { useQuery } from "react-query";
+import { useEffect, useState } from "react";
+import { Loading } from "../components/loading/Loading";
 
 type AuthProviderProps = {
   children: any;
@@ -9,24 +10,40 @@ type AuthProviderProps = {
 const getUser = async () => {
   const auth = await supabase.auth.getUser();
 
-  if (auth.error) return;
+  if (auth.error) return null;
 
-  const data = await supabase
-    .from("users")
-    .select("cod,email,role,equipe:id_equipe (id, empresas: id_empresa)")
-    .eq("email", auth.data.user.email);
+  const data = await supabase.from("users").select("cod,email,role,equipe:id_equipe (id, empresas: id_empresa)").eq("email", auth.data.user.email);
 
-  return { userData: data.data, auth: auth };
+  return data.data;
 };
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const { data, isLoading } = useQuery("getUserFromAuth", getUser);
+  const [user, setUser] = useState<any>();
+  const [isLoading, setIsLoading] = useState<boolean>();
 
-  return (
-    <AuthContext.Provider
-      value={{ user: data?.userData, auth: data?.auth, isLoading }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  const signIn = async () => {
+    setIsLoading(true);
+    const response = await getUser();
+    setUser(response);
+    setIsLoading(false);
+  };
+
+  const signOut = async () => {
+    setIsLoading(true);
+    await supabase.auth.signOut();
+    setUser(null);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    setIsLoading(true);
+    getUser().then((response: any) => {
+      setUser(response);
+      setIsLoading(false);
+    });
+  }, []);
+
+  if (isLoading) return <Loading />;
+
+  return <AuthContext.Provider value={{ user: user, isLoading, signIn, signOut }}>{children}</AuthContext.Provider>;
 };

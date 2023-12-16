@@ -1,0 +1,13 @@
+@import "../../../styles/colors.module.scss";
+
+.filterHandler {
+  font-family: $font;
+  padding: 4px;
+  outline: none;
+  border: 1px solid #8d8d8d;
+  width: 80%;
+  justify-self: center;
+  color: #555;
+  margin-top: 3px;
+  font-size:12px;
+}
