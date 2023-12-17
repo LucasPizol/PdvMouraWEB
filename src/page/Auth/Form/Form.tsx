@@ -1,6 +1,5 @@
 import { useAuthContext } from "../../../context/AuthContext";
 import { useForm } from "../../../hooks/useForm";
-import { supabase } from "../../../supabase";
 import styles from "./styles.module.scss";
 import { MdPerson, MdLock } from "react-icons/md";
 import Swal from "sweetalert2";
@@ -17,7 +16,7 @@ export const Form = () => {
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
-    const { data, error } = await supabase.auth.signInWithPassword(fields);
+    const { data, error } = await signIn(fields);
 
     if (error) {
       return Swal.fire({
@@ -27,7 +26,7 @@ export const Form = () => {
         confirmButtonText: "Cool",
       });
     }
-    await signIn();
+
     return { data, error };
   };
 

@@ -7,25 +7,42 @@ type AuthProviderProps = {
   children: any;
 };
 
-const getUser = async () => {
-  const auth = await supabase.auth.getUser();
+const getUser = async (user?: any) => {
+  const auth = user || (await supabase.auth.getUser());
 
-  if (auth.error) return null;
+  if (auth.error) return { data: auth.data, error: auth.error };
 
-  const data = await supabase.from("users").select("cod,email,role,equipe:id_equipe (id, empresas: id_empresa)").eq("email", auth.data.user.email);
+  const { data, error } = await supabase
+    .from("users")
+    .select("cod,email,role,equipe:id_equipe (id, empresas: id_empresa)")
+    .eq("email", auth.data.user.email);
 
-  return data.data;
+  if (error) return { data, error };
+
+  if (data[0]?.role !== "master") return { data: null, error: { message: "Não autorizado." } };
+
+  return { data, error };
 };
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<any>();
   const [isLoading, setIsLoading] = useState<boolean>();
 
-  const signIn = async () => {
+  const signIn = async ({ email, password }: { email: string; password: string }) => {
     setIsLoading(true);
-    const response = await getUser();
-    setUser(response);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) return { data, error };
+
+    const response = await getUser({ data: { user: data.user }, session: data.session });
+
+    setUser(response.data);
     setIsLoading(false);
+
+    return { data: response.data, error: response.error };
   };
 
   const signOut = async () => {
@@ -38,7 +55,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     setIsLoading(true);
     getUser().then((response: any) => {
-      setUser(response);
+
+      if (response?.data[0]) {
+        setUser(response?.data);
+        setIsLoading(false);
+        return;
+      }
+
+      setUser(null);
       setIsLoading(false);
     });
   }, []);
