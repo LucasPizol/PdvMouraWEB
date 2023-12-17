@@ -99,6 +99,8 @@ export const Historic = () => {
 
       if (!item) return;
 
+      console.log(item.favorecido)
+
       return {
         //@ts-ignore
         id: item.item.id,
@@ -115,12 +117,12 @@ export const Historic = () => {
         id_empresa: item.item.id_empresa,
         qtd_disponivel:
           //@ts-ignore
-          item?.favorecido?.favorecido === null
+          item?.favorecido === null
             ? //@ts-ignore
-              Number(item.item.qtd_disponivel) + item.quantidade
+              Number(item.item.qtd_disponivel) - item.quantidade
             : //@ts-ignore
 
-              Number(item.item.qtd_disponivel) - item.quantidade,
+              Number(item.item.qtd_disponivel) + item.quantidade,
       };
     });
     if (confirm.isConfirmed) {

@@ -117,7 +117,7 @@ export const Favorecidos = () => {
           <FilterInput name="favorecido" onChange={handleSearch} justifyStart />
         </div>
         <div className={styles.tableContent}>
-          <FlatList list={favorecidos} renderItem={TableRow} renderWhenEmpty={<p>Nada para mostrar</p>} />
+          <FlatList list={favorecidos} renderItem={TableRow} renderWhenEmpty={() => <p>Nada para mostrar</p>} />
         </div>
       </div>
     </div>
