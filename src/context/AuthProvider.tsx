@@ -17,9 +17,12 @@ const getUser = async (user?: any) => {
     .select("cod,email,role,equipe:id_equipe (id, empresas: id_empresa)")
     .eq("email", auth.data.user.email);
 
+  console.log(auth, error);
+
   if (error) return { data, error };
 
-  if (data[0]?.role !== "master") return { data: null, error: { message: "Não autorizado." } };
+  if (data[0]?.role !== "master")
+    return { data: null, error: { message: "Não autorizado." } };
 
   return { data, error };
 };
@@ -28,7 +31,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<any>();
   const [isLoading, setIsLoading] = useState<boolean>();
 
-  const signIn = async ({ email, password }: { email: string; password: string }) => {
+  const signIn = async ({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }) => {
     setIsLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -37,7 +46,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     if (error) return { data, error };
 
-    const response = await getUser({ data: { user: data.user }, session: data.session });
+    const response = await getUser({
+      data: { user: data.user },
+      session: data.session,
+    });
 
     setUser(response.data);
     setIsLoading(false);
@@ -55,7 +67,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     setIsLoading(true);
     getUser().then((response: any) => {
-
       if (response?.data[0]) {
         setUser(response?.data);
         setIsLoading(false);
@@ -69,5 +80,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   if (isLoading) return <Loading />;
 
-  return <AuthContext.Provider value={{ user: user, isLoading, signIn, signOut }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user: user, isLoading, signIn, signOut }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

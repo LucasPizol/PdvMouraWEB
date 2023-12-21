@@ -22,6 +22,7 @@ const getUsers = async (user: UserType) => {
     .eq("role", "salesperson")
     .order("cod");
 
+  console.log(data);
   return { data, error };
 };
 
@@ -32,7 +33,9 @@ const getData = async (user: UserType) => {
 
   const { data, error } = await supabase
     .from("customers")
-    .select("cod,razao_social,cidade,users!inner(cod, equipe!users_id_equipe_fkey(id_empresa)),pdvs (id)")
+    .select(
+      "cod,razao_social,cidade,users!inner(cod, equipe!users_id_equipe_fkey(id_empresa)),pdvs (id)"
+    )
     .order("razao_social")
     .ilike("users.cod", `%${String(equipe.id).slice(0, 3)}%`);
 
@@ -65,21 +68,38 @@ export const Customers = () => {
   const users = useQuery("getSellers", () => getUsers(user));
   const customersList = useQuery("getCustomersPage", () => getData(user));
 
-  const handleSearch = (e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => {
+  const handleSearch = (
+    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
+  ) => {
     const field = { ...fields, [e.currentTarget.name]: e.currentTarget.value };
 
     setFields(field);
-    const filteredCustomers = customersList?.data?.data?.filter((customer: any) => {
-      const checkRazao = customer.razao_social.toLowerCase().includes(field.razao_social.toLowerCase());
-      const checkCod = String(customer.cod).includes(field.cod);
-      const checkCity = customer.cidade.toLowerCase().includes(field.cidade.toLowerCase());
+    const filteredCustomers = customersList?.data?.data?.filter(
+      (customer: any) => {
+        const checkRazao = customer.razao_social
+          .toLowerCase()
+          .includes(field.razao_social.toLowerCase());
+        const checkCod = String(customer.cod).includes(field.cod);
+        const checkCity = customer.cidade
+          .toLowerCase()
+          .includes(field.cidade.toLowerCase());
 
-      const checkUserCod = field.user_cod === "Todos" ? true : String(customer.users.cod).includes(field.user_cod);
+        const checkUserCod =
+          field.user_cod === "Todos"
+            ? true
+            : String(customer.users.cod).includes(field.user_cod);
 
-      const checkPdv = field.pdv === "Todos" ? true : field.pdv === "Sim" ? customer.pdvs.length >= 1 : customer.pdvs.length === 0;
+        console.log(field.pdv);
+        const checkPdv =
+          field.pdv === "Todos"
+            ? true
+            : field.pdv === "Sim"
+            ? customer.pdvs.length >= 1
+            : customer.pdvs.length === 0;
 
-      return checkRazao && checkCod && checkCity && checkUserCod && checkPdv;
-    });
+        return checkRazao && checkCod && checkCity && checkUserCod && checkPdv;
+      }
+    );
 
     setCustomers(filteredCustomers);
   };
@@ -103,13 +123,33 @@ export const Customers = () => {
         </div>
         <div className={styles.tableFilter} style={{ gridTemplateColumns }}>
           <FilterInput name="cod" onChange={handleSearch} />
-          <FilterInput name="razao_social" onChange={handleSearch} justifyStart />
+          <FilterInput
+            name="razao_social"
+            onChange={handleSearch}
+            justifyStart
+          />
           <FilterInput name="cidade" onChange={handleSearch} />
-          <Select name="user_cod" onChange={handleSearch} text_key="cod" value_key="cod" array={[{ cod: "Todos" }, ...(users?.data?.data || [])]} />
-          <Select name="user_cod" onChange={handleSearch} text_key="value" value_key="value" array={pdvsStatus} />
+          <Select
+            name="user_cod"
+            onChange={handleSearch}
+            text_key="cod"
+            value_key="cod"
+            array={[{ cod: "Todos" }, ...(users?.data?.data || [])]}
+          />
+          <Select
+            name="pdv"
+            onChange={handleSearch}
+            text_key="value"
+            value_key="value"
+            array={pdvsStatus}
+          />
         </div>
         <div className={styles.tableContent}>
-          <FlatList list={customers} renderItem={TableRow} renderWhenEmpty={() => <p>Nada para mostrar</p>} />
+          <FlatList
+            list={customers}
+            renderItem={TableRow}
+            renderWhenEmpty={() => <p>Nada para mostrar</p>}
+          />
         </div>
       </div>
     </div>

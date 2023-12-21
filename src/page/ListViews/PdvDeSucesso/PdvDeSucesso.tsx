@@ -27,7 +27,12 @@ export interface PDVdeSucesso {
   id: number;
 }
 
-const situations = [{ value: "Todos" }, { value: "Aguardando" }, { value: "APROVADO" }, { value: "REPROVADO" }];
+const situations = [
+  { value: "Todos" },
+  { value: "Aguardando" },
+  { value: "APROVADO" },
+  { value: "REPROVADO" },
+];
 
 const getDescription = (situation: boolean) => {
   return situation ? "APROVADO" : "REPROVADO";
@@ -40,10 +45,11 @@ const getUsers = async (user: UserType) => {
 
   const { data, error } = await supabase
     .from("users")
-    .select("cod,equipe: id_equipe(id_empresa)")
+    .select("cod, equipe: id_equipe(id_empresa)")
+    .ilike("cod", `%${String(equipe.id).slice(0, 3)}%`)
     .eq("role", "salesperson")
-    .eq("equipe.id_empresa", equipe.empresas)
     .order("cod");
+
   return { data, error };
 };
 
@@ -53,7 +59,9 @@ const getCustomers = async (user: UserType) => {
 
   const { data } = await supabase
     .from("pdvs")
-    .select("customers!inner (razao_social, cidade, cod, user_cod, logradouro),img_url1,img_url2,approved,id")
+    .select(
+      "customers!inner (razao_social, cidade, cod, user_cod, logradouro),img_url1,img_url2,approved,id"
+    )
     .in(
       "customers.user_cod",
       usersData!.data!.map((seller: { cod: number }) => seller.cod)
@@ -75,32 +83,47 @@ export const PdvDeSucesso = () => {
   });
 
   const users = useQuery("getSellers", () => getUsers(user));
-  const customersData = useQuery("getCustomersDataPdv", () => getCustomers(user));
+  const customersData = useQuery("getCustomersDataPdv", () =>
+    getCustomers(user)
+  );
   const [customers, setCustomers] = useState<any>();
 
-  const handleSearch = (e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => {
+  const handleSearch = (
+    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
+  ) => {
     const field = { ...fields, [e.currentTarget.name]: e.currentTarget.value };
 
     setFields(field);
 
-    const filteredCustomers = customersData?.data?.filter((pdvDeSucesso: any) => {
-      const checkRazao = pdvDeSucesso.customers.razao_social.toLowerCase().includes(field.razao_social.toLowerCase());
-      const checkCod = String(pdvDeSucesso.customers.cod).includes(field.cod);
-      const checkCity = pdvDeSucesso.customers.cidade.toLowerCase().includes(field.cidade.toLowerCase());
+    const filteredCustomers = customersData?.data?.filter(
+      (pdvDeSucesso: any) => {
+        const checkRazao = pdvDeSucesso.customers.razao_social
+          .toLowerCase()
+          .includes(field.razao_social.toLowerCase());
+        const checkCod = String(pdvDeSucesso.customers.cod).includes(field.cod);
+        const checkCity = pdvDeSucesso.customers.cidade
+          .toLowerCase()
+          .includes(field.cidade.toLowerCase());
 
-      const checkUserCod = field.user_cod === "Todos" ? true : String(pdvDeSucesso.customers.user_cod).includes(field.user_cod);
+        const checkUserCod =
+          field.user_cod === "Todos"
+            ? true
+            : String(pdvDeSucesso.customers.user_cod).includes(field.user_cod);
 
-      const checkSituacao =
-        field.situacao === "Todos"
-          ? true
-          : pdvDeSucesso.approved === null
-          ? field.situacao === "Aguardando"
-          : pdvDeSucesso.approved
-          ? field.situacao === "APROVADO"
-          : field.situacao === "REPROVADO";
+        const checkSituacao =
+          field.situacao === "Todos"
+            ? true
+            : pdvDeSucesso.approved === null
+            ? field.situacao === "Aguardando"
+            : pdvDeSucesso.approved
+            ? field.situacao === "APROVADO"
+            : field.situacao === "REPROVADO";
 
-      return checkRazao && checkCod && checkCity && checkUserCod && checkSituacao;
-    });
+        return (
+          checkRazao && checkCod && checkCity && checkUserCod && checkSituacao
+        );
+      }
+    );
 
     setCustomers(filteredCustomers);
   };
@@ -111,7 +134,11 @@ export const PdvDeSucesso = () => {
 
   const TableRow = ({ id, customers, img_url1, img_url2, approved }: any) => {
     return (
-      <div key={customers?.cod} className={styles.tableRow} style={{ gridTemplateColumns }}>
+      <div
+        key={customers?.cod}
+        className={styles.tableRow}
+        style={{ gridTemplateColumns }}
+      >
         <p>{customers?.cod}</p>
         <p>{customers?.razao_social}</p>
         <p>{customers?.cidade}</p>
@@ -147,13 +174,33 @@ export const PdvDeSucesso = () => {
         </div>
         <div className={styles.tableFilter} style={{ gridTemplateColumns }}>
           <FilterInput name="cod" onChange={handleSearch} />
-          <FilterInput name="razao_social" onChange={handleSearch} justifyStart />
+          <FilterInput
+            name="razao_social"
+            onChange={handleSearch}
+            justifyStart
+          />
           <FilterInput name="cidade" onChange={handleSearch} />
-          <Select name="user_cod" onChange={handleSearch} text_key="cod" value_key="cod" array={[{ cod: "Todos" }, ...(users?.data?.data || [])]} />
-          <Select name="situacao" onChange={handleSearch} text_key="value" value_key="value" array={situations} />
+          <Select
+            name="user_cod"
+            onChange={handleSearch}
+            text_key="cod"
+            value_key="cod"
+            array={[{ cod: "Todos" }, ...(users?.data?.data || [])]}
+          />
+          <Select
+            name="situacao"
+            onChange={handleSearch}
+            text_key="value"
+            value_key="value"
+            array={situations}
+          />
         </div>
         <div className={styles.tableContent}>
-          <FlatList list={customers} renderItem={TableRow} renderWhenEmpty={<p>Nada para mostrar</p>} />
+          <FlatList
+            list={customers}
+            renderItem={TableRow}
+            renderWhenEmpty={<p>Nada para mostrar</p>}
+          />
         </div>
       </div>
     </div>
