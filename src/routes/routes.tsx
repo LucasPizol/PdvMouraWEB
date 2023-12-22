@@ -11,7 +11,7 @@ import { Pedido } from "../page/Register/Pedido/Pedido";
 import { Customers } from "../page/ListViews/Customers/Customers";
 import { Favorecido } from "../page/Register/Favorecido/Favorecido";
 import { RedirectPage } from "./RedirectPage";
-import { PdvDeSucesso } from "../page/ListViews/PdvDeSucesso/PdvDeSucesso";
+import { ListPdvs } from "../page/ListViews/PdvDeSucesso/ListViewModel";
 
 interface User {
   cod: string;
@@ -29,12 +29,14 @@ export const RoutesApp = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {!user ? (
+        {!user && (
           <>
             <Route path="/auth/login" element={<Login />} />
             <Route path="*" element={<RedirectPage routeString="/auth/login" />} />
           </>
-        ) : (
+        )}
+
+        {user && (
           <>
             <Route path="/" element={<DefaultPage Component={Stock} />} />
             <Route path="/novo/item" element={<DefaultPage Component={Item} />} />
@@ -42,7 +44,7 @@ export const RoutesApp = () => {
             <Route path="/novo/favorecido" element={<DefaultPage Component={Favorecido} />} />
             <Route path="/historico" element={<DefaultPage Component={Historic} />} />
             <Route path="/novo/pedido" element={<DefaultPage Component={Pedido} />} />
-            <Route path="/pdvDeSucesso" element={<DefaultPage Component={PdvDeSucesso} />} />
+            <Route path="/pdvDeSucesso" element={<DefaultPage Component={ListPdvs} />} />
             <Route path="/customers" element={<DefaultPage Component={Customers} />} />
             <Route path="/pdvPage" element={<DefaultPage Component={PdvPage} />} />
             <Route path="*" element={<RedirectPage routeString="/" />} />

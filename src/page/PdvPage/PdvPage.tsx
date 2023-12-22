@@ -4,7 +4,6 @@ import Switch from "react-switch";
 import { ChangeEvent, useState } from "react";
 import { supabase } from "../../supabase";
 import Swal from "sweetalert2";
-import { PDVdeSucesso } from "../ListViews/PdvDeSucesso/PdvDeSucesso";
 
 const getDescription = (situation: boolean) => {
   return situation ? "APROVADO" : "REPROVADO";
@@ -15,7 +14,7 @@ export const PdvPage = () => {
   const [text, setText] = useState<string>("");
   const navigate = useNavigate();
 
-  const pdv: PDVdeSucesso = useLocation().state;
+  const pdv = useLocation().state;
 
   const handleChangeSwitch = () => {
     setIsApproved(!isApproved);

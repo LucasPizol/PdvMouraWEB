@@ -11,11 +11,20 @@ import Select from "../../../components/ui/select/Select";
 const gridTemplateColumns = "0.6fr 3fr 2fr 0.6fr 2fr";
 const pdvsStatus = [{ value: "Todos" }, { value: "Sim" }, { value: "Não" }];
 
+type Customers =
+  | {
+      cod: string;
+      equipe: {
+        id_empresa: number;
+      }[];
+    }[]
+  | null;
+
 const getUsers = async (user: UserType) => {
   if (!user) return;
   //@ts-ignore
   const equipe: { id: number; empresas: number } = user[0].equipe;
-  const { data, error } = await supabase
+  const { data, error }: { data: Customers; error: any } = await supabase
     .from("users")
     .select("cod, equipe: id_equipe(id_empresa)")
     .ilike("cod", `%${String(equipe.id).slice(0, 3)}%`)
