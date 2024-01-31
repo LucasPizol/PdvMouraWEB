@@ -1,4 +1,4 @@
-import { IoTrashSharp } from "react-icons/io5";
+import { MdDownload } from "react-icons/md";
 import styles from "./styles.module.scss";
 
 type Props = {
@@ -7,7 +7,7 @@ type Props = {
   onClick: any;
 };
 
-export const HeaderShown = ({ children, checked, onClick }: Props) => {
+export const HeaderDownload = ({ children, checked, onClick }: Props) => {
   return (
     <>
       {checked.length === 0 ? (
@@ -18,8 +18,8 @@ export const HeaderShown = ({ children, checked, onClick }: Props) => {
           className={styles.remove}
           onClick={onClick}
         >
-          <IoTrashSharp size={20} />
-          {`Remover ${checked.length} item(ns)`}
+          <MdDownload size={20} />
+          {`Baixar fotos de ${checked.length} item(ns)`}
         </p>
       )}
     </>

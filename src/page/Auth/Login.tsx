@@ -7,11 +7,14 @@ export const Login = () => {
       <div className={styles.container}>
         <div className={styles.formDiv}>
           <div className={styles.title}>
-            <h2>Bem vindo de volta!</h2>
-            <p>O aplicativo para facilitar o dia a dia do staff de vendas</p>
+            <h2>Trade Fácil</h2>
+            <p>Gestão do Trade Marketing rede Moura</p>
           </div>
           <Form />
-          <img src="https://logodownload.org/wp-content/uploads/2017/08/moura-logo.png" alt="logo baterias moura" />
+          <img
+            src="https://logodownload.org/wp-content/uploads/2017/08/moura-logo.png"
+            alt="logo baterias moura"
+          />
         </div>
         <img
           className={styles.asideImage}

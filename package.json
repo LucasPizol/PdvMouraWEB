@@ -3,6 +3,12 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "ts-node": {
+    "esm": true,
+    "compilerOptions": {
+      "module": "nodenext"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -11,7 +17,10 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
+    "@types/file-saver": "^2.0.7",
+    "file-saver": "^2.0.5",
     "flatlist-react": "^1.5.14",
+    "jszip": "^3.10.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.12.0",
